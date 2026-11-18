@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TEAM 3P - Virtual Office (Full Sprite Pack)</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tahoma', 'Segoe UI', sans-serif; }
+    body {
+      background: #0f131c;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+      user-select: none;
+      gap: 10px;
+    }
+    .office-frame {
+      position: relative;
+      background: #1a2030;
+      border: 3px solid #334155;
+      border-radius: 14px;
+      box-shadow: 0 20px 55px rgba(0,0,0,0.8);
+      overflow: hidden;
+    }
+    canvas { display: block; cursor: pointer; image-rendering: pixelated; }
+
+    /* Top HUD */
+    .top-hud {
+      position: absolute;
+      top: 12px;
+      left: 14px;
+      right: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      pointer-events: none;
+    }
+    .status-badge {
+      background: rgba(15, 23, 42, 0.88);
+      border: 1.5px solid #475569;
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-size: 12.5px;
+      color: #f8fafc;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+    .status-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #22c55e;
+      box-shadow: 0 0 8px #22c55e;
+    }
+
+    /* Bottom Action & Emote Bar */
+    .hud-bottom {
+      position: absolute;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      width: 95%;
+      max-width: 920px;
+    }
+    .emote-bar {
+      background: rgba(15, 23, 42, 0.94);
+      border: 1.5px solid #475569;
+      border-radius: 12px;
+      padding: 6px 10px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.65);
+    }
+    .emote-btn {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #e2e8f0;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+    }
+    .emote-btn:hover {
+      background: #334155;
+      border-color: #64748b;
+      transform: translateY(-2px);
+    }
+    .emote-btn.active {
+      background: #0284c7;
+      border-color: #38bdf8;
+      color: #fff;
+      font-weight: bold;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.45);
+    }
+    .emote-btn kbd {
+      background: rgba(0,0,0,0.35);
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-size: 10px;
+      color: #94a3b8;
+    }
+    .emote-btn.active kbd {
+      color: #e0f2fe;
+    }
+    .guide-text {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid #334155;
+      border-radius: 999px;
+      padding: 4px 14px;
+      font-size: 11.5px;
+      color: #cbd5e1;
+    }
+    .guide-text b { color: #38bdf8; }
+  </style>
+</head>
+<body>
+
+<div class="office-frame">
+  <canvas id="officeCanvas" width="960" height="640"></canvas>
+
+  <div class="top-hud">
+    <div class="status-badge">
+      <span class="status-dot" id="statusDot"></span>
+      <span>สถานะ: <b id="statusText">กำลังโหลดชุดภาพ...</b></span>
+    </div>
+    <div class="status-badge">
+      <span>ทิศทาง: <b id="facingText">หน้า (Front)</b></span>
+    </div>
+  </div>
+
+  <div class="hud-bottom">
+    <div class="guide-text" id="zoneHint">
+      🎮 กด <b>W A S D</b> / <b>ลูกศร</b> หรือ <b>คลิกพื้นไม้</b> เพื่อเดิน 4 ทิศทาง | กด <b>E</b> โต้ตอบกับจุดใกล้ตัว | กดปุ่มด้านล่างหรือ <b>เลข 1-9</b> เพื่อเปลี่ยนท่าทาง
+    </div>
+    <div class="emote-bar" id="emoteBar">
+      <button class="emote-btn active" data-action="idle"><kbd>0</kbd> 🧍 ยืนปกติ</button>
+      <button class="emote-btn" data-action="wave"><kbd>1</kbd> 👋 ทักทาย</button>
+      <button class="emote-btn" data-action="talk"><kbd>2</kbd> 💬 คุยงาน</button>
+      <button class="emote-btn" data-action="sit"><kbd>3</kbd> 🪑 นั่ง (3 ท่า)</button>
+      <button class="emote-btn" data-action="eat"><kbd>4</kbd> 🍗 กินข้าว</button>
+      <button class="emote-btn" data-action="laugh"><kbd>5</kbd> 😂 หัวเราะ</button>
+      <button class="emote-btn" data-action="angry"><kbd>6</kbd> 😡 หัวร้อน</button>
+      <button class="emote-btn" data-action="focus"><kbd>7</kbd> 😠 หน้าเข้ม</button>
+      <button class="emote-btn" data-action="victory"><kbd>8</kbd> ✌️ ชนะ/สำเร็จ</button>
+      <button class="emote-btn" data-action="sleep"><kbd>9</kbd> 💤 นอนหลับ</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const canvas = document.getElementById('officeCanvas');
+const ctx = canvas.getContext('2d');
+
+// 1. โหลด Sprite Sheet ทั้ง 2 แผ่นที่ลบพื้นหลังโปร่งใสแล้ว
+const sheet1 = new Image();
+const sheet2 = new Image();
+let loadedSheets = 0;
+
+function onSheetLoad() {
+  loadedSheets++;
+  if (loadedSheets === 2) {
+    document.getElementById('statusText').textContent = 'พร้อมลุยงาน (Idle)';
+  }
+}
+sheet1.onload = onSheetLoad;
+sheet2.onload = onSheetLoad;
+sheet1.src = 'my_sprite1.png';
+sheet2.src = 'my_sprite2.png';
+
+// อัตราส่วนภาพเพื่อให้ตัวละครจากทั้ง 2 แผ่นมีขนาดเท่ากันเป๊ะ
+const SCALE_S1 = 0.64;
+const SCALE_S2 = 0.64 / 2.34375;
+
+// พิกัดเฟรมทั้งหมดจาก my_sprite1.png (s: 1) และ my_sprite2.png (s: 2)
+const ANIMATIONS = {
+  // ท่ายืนนิ่ง 4 ทิศทาง (ล็อกเฟรมค้างตามทิศที่หัน ไม่ส่ายหน้าไปมา)
+  idle_down: {
+    s: 1, fps: 0,
+    frames: [
+      { x: 36, y: 36, w: 69, h: 123 }
+    ]
+  },
+  idle_up: {
+    s: 1, fps: 0,
+    frames: [
+      { x: 643, y: 36, w: 70, h: 123 }
+    ]
+  },
+  idle_left: {
+    s: 1, fps: 0,
+    frames: [
+      { x: 653, y: 333, w: 64, h: 125 }
+    ]
+  },
+  idle_right: {
+    s: 1, fps: 0,
+    frames: [
+      { x: 36, y: 333, w: 63, h: 125 }
+    ]
+  },
+
+  // ท่าเดิน 4 ทิศทาง
+  walk_right: {
+    s: 2, fps: 8,
+    frames: [
+      { x: 77, y: 82, w: 164, h: 287 },
+      { x: 364, y: 82, w: 154, h: 287 },
+      { x: 634, y: 82, w: 166, h: 284 },
+      { x: 920, y: 82, w: 143, h: 287 }
+    ]
+  },
+  walk_left: {
+    s: 2, fps: 8, flipX: true,
+    frames: [
+      { x: 77, y: 82, w: 164, h: 287 },
+      { x: 364, y: 82, w: 154, h: 287 },
+      { x: 634, y: 82, w: 166, h: 284 },
+      { x: 920, y: 82, w: 143, h: 287 }
+    ]
+  },
+  walk_down: {
+    s: 1, fps: 6, bob: true,
+    frames: [
+      { x: 36, y: 36, w: 69, h: 123 },
+      { x: 160, y: 36, w: 70, h: 123 }
+    ]
+  },
+  walk_up: {
+    s: 1, fps: 6, bob: true,
+    frames: [
+      { x: 643, y: 36, w: 70, h: 123 },
+      { x: 776, y: 36, w: 69, h: 122 }
+    ]
+  },
+
+  // ท่าแสดงอารมณ์และกิจกรรมพิเศษ (จากแผ่นที่ 1 และ 2)
+  focus: {
+    s: 1, fps: 3, label: '😠 โหมดโฟกัส (Focus)',
+    frames: [
+      { x: 36, y: 474, w: 70, h: 127 },
+      { x: 162, y: 474, w: 69, h: 127 },
+      { x: 285, y: 474, w: 66, h: 127 },
+      { x: 408, y: 474, w: 68, h: 127 }
+    ]
+  },
+  sit: {
+    s: 2, fps: 0, label: '🪑 นั่งพักผ่อน (Sit)',
+    frames: [
+      { x: 1462, y: 87, w: 240, h: 258 },
+      { x: 1812, y: 87, w: 150, h: 267 },
+      { x: 2106, y: 86, w: 174, h: 271 }
+    ]
+  },
+  eat: {
+    s: 2, fps: 2.2, label: '🍗 กำลังกินของอร่อย (Eat)',
+    frames: [
+      { x: 54, y: 773, w: 191, h: 269 },
+      { x: 380, y: 773, w: 156, h: 269 },
+      { x: 660, y: 774, w: 159, h: 268 }
+    ]
+  },
+  talk: {
+    s: 2, fps: 2.5, label: '💬 กำลังคุยงาน (Talk)',
+    frames: [
+      { x: 1532, y: 714, w: 268, h: 350, ox: 28 },
+      { x: 1841, y: 714, w: 264, h: 350, ox: 26 },
+      { x: 2103, y: 714, w: 267, h: 350, ox: 18 }
+    ]
+  },
+  angry: {
+    s: 2, fps: 3.5, label: '😡 หัวร้อน / บั๊กเพียบ! (Angry)',
+    frames: [
+      { x: 81, y: 1105, w: 207, h: 302 },
+      { x: 371, y: 1105, w: 216, h: 302 },
+      { x: 653, y: 1105, w: 222, h: 302 },
+      { x: 909, y: 1053, w: 281, h: 354 }
+    ]
+  },
+  laugh: {
+    s: 2, fps: 4, label: '😂 หัวเราะอารมณ์ดี (Laugh)',
+    frames: [
+      { x: 27, y: 1455, w: 271, h: 324 },
+      { x: 308, y: 1455, w: 298, h: 324 },
+      { x: 649, y: 1455, w: 242, h: 324 },
+      { x: 907, y: 1455, w: 300, h: 324 }
+    ]
+  },
+  wave: {
+    s: 2, fps: 3, bob: true, label: '👋 โบกมือทักทาย (Wave)',
+    frames: [
+      { x: 1490, y: 1476, w: 199, h: 302 }
+    ]
+  },
+  sleep: {
+    s: 2, fps: 2, label: '💤 งีบหลับเติมพลัง (Sleep)',
+    frames: [
+      { x: 1813, y: 1467, w: 244, h: 310 }
+    ]
+  },
+  victory: {
+    s: 2, fps: 4, bob: true, label: '✌️ ปิดจ๊อบสำเร็จ! (Victory)',
+    frames: [
+      { x: 2117, y: 1472, w: 241, h: 306 }
+    ]
+  }
+};
+
+// โซนกิจกรรมในออฟฟิศ
+const ZONES = [
+  { name: 'โต๊ะทำงาน Lead', x: 105, y: 150, w: 160, h: 90, action: 'sit', hint: 'กด [E] เพื่อนั่งทำงานที่โต๊ะ Lead' },
+  { name: 'โต๊ะทำงาน Dev',  x: 400, y: 150, w: 160, h: 90, action: 'focus', hint: 'กด [E] เพื่อเข้าโหมดโฟกัสเขียนโค้ด' },
+  { name: 'โต๊ะทำงาน Design', x: 695, y: 150, w: 160, h: 90, action: 'victory', hint: 'กด [E] เพื่อฉลองงานเสร็จ' },
+  { name: 'ห้องประชุมกลาง', x: 355, y: 345, w: 250, h: 170, action: 'talk', hint: 'กด [E] เพื่อเริ่มคุยประชุมงาน' },
+  { name: 'มุมพักผ่อน (Nap Zone)', x: 45, y: 400, w: 175, h: 120, action: 'sleep', hint: 'กด [E] เพื่อนอนงีบพักสายตา' },
+  { name: 'มุมขนม & กาแฟ (Pantry)', x: 740, y: 400, w: 175, h: 120, action: 'eat', hint: 'กด [E] เพื่อพักกินไก่ทอด/ผลไม้/ดื่มน้ำ' }
+];
+
+const me = {
+  name: 'คุณ (Lead)',
+  x: 185, y: 265,
+  targetX: 185, targetY: 265,
+  facing: 'down', // 'down' | 'up' | 'left' | 'right'
+  isMoving: false,
+  action: 'idle', // 'idle' | 'wave' | 'talk' | 'sit' | 'eat' | 'laugh' | 'angry' | 'focus' | 'victory' | 'sleep'
+  sitVariant: 0,
+  lastActiveTime: performance.now()
+};
+
+function setAction(newAction) {
+  if (newAction === 'sit' && me.action === 'sit') {
+    me.sitVariant = (me.sitVariant + 1) % 3;
+  }
+  me.action = newAction;
+  me.lastActiveTime = performance.now();
+
+  // อัปเดตปุ่มที่เลือก
+  document.querySelectorAll('.emote-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.action === newAction);
+  });
+
+  // อัปเดตข้อความสถานะด้านบน
+  const statusEl = document.getElementById('statusText');
+  const dotEl = document.getElementById('statusDot');
+  if (newAction === 'idle') {
+    statusEl.textContent = me.isMoving ? 'กำลังเดิน...' : 'พร้อมลุยงาน (Idle)';
+    dotEl.style.background = '#22c55e';
+    dotEl.style.boxShadow = '0 0 8px #22c55e';
+  } else {
+    const anim = ANIMATIONS[newAction];
+    statusEl.textContent = anim && anim.label ? anim.label : newAction;
+    dotEl.style.background = newAction === 'angry' ? '#ef4444' : (newAction === 'sleep' ? '#a855f7' : '#38bdf8');
+    dotEl.style.boxShadow = `0 0 8px ${dotEl.style.background}`;
+  }
+}
+
+// ปุ่มกดเลือกท่าทางด้านล่าง
+document.querySelectorAll('.emote-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    me.targetX = me.x;
+    me.targetY = me.y;
+    me.isMoving = false;
+    setAction(btn.dataset.action);
+  });
+});
+
+const keys = {};
+const SHORTCUT_MAP = {
+  '0': 'idle',
+  '1': 'wave',
+  '2': 'talk',
+  '3': 'sit',
+  '4': 'eat',
+  '5': 'laugh',
+  '6': 'angry',
+  '7': 'focus',
+  '8': 'victory',
+  '9': 'sleep'
+};
+
+window.addEventListener('keydown', e => {
+  const k = e.key.toLowerCase();
+  keys[k] = true;
+  me.lastActiveTime = performance.now();
+
+  if (SHORTCUT_MAP[k]) {
+    me.targetX = me.x;
+    me.targetY = me.y;
+    me.isMoving = false;
+    setAction(SHORTCUT_MAP[k]);
+  } else if (k === 'e') {
+    const z = getCurrentZone();
+    if (z) {
+      me.targetX = me.x;
+      me.targetY = me.y;
+      me.isMoving = false;
+      setAction(z.action);
+    }
+  }
+});
+
+window.addEventListener('keyup', e => {
+  keys[e.key.toLowerCase()] = false;
+});
+
+canvas.addEventListener('click', e => {
+  const rect = canvas.getBoundingClientRect();
+  const cx = e.clientX - rect.left;
+  const cy = e.clientY - rect.top;
+  if (cy > 95 && cy < 575) {
+    me.targetX = cx;
+    me.targetY = cy;
+    me.lastActiveTime = performance.now();
+    if (me.action !== 'idle') setAction('idle');
+  }
+});
+
+function getCurrentZone() {
+  return ZONES.find(z => me.x >= z.x && me.x <= z.x + z.w && me.y >= z.y && me.y <= z.y + z.h);
+}
+
+// 2. วาดฉากออฟฟิศ
+function drawOffice() {
+  // พื้นไม้
+  ctx.fillStyle = '#b88655';
+  ctx.fillRect(0, 80, canvas.width, canvas.height - 80);
+  ctx.strokeStyle = '#7c532c';
+  ctx.lineWidth = 1.5;
+  for (let row = 0; row < 22; row++) {
+    const y = 80 + row * 26;
+    const offset = (row % 2) * 40;
+    for (let col = -1; col < 14; col++) {
+      ctx.strokeRect(col * 80 + offset, y, 80, 26);
+    }
+  }
+
+  // ผนัง & ป้าย TEAM 3P
+  ctx.fillStyle = '#1b2232';
+  ctx.fillRect(0, 0, canvas.width, 80);
+  ctx.fillStyle = '#ea580c';
+  ctx.fillRect(390, 12, 180, 56);
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 26px monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText('TEAM 3P', 480, 49);
+
+  // โต๊ะทำงาน 3 ตัว
+  const deskNames = ['Lead Desk', 'Dev Desk', 'Design Desk'];
+  [105, 400, 695].forEach((dx, idx) => {
+    ctx.fillStyle = '#d6b485';
+    ctx.fillRect(dx, 150, 160, 56);
+    ctx.strokeStyle = '#45270c';
+    ctx.strokeRect(dx, 150, 160, 56);
+    ctx.fillStyle = '#1e293b';
+    ctx.fillRect(dx + 30, 138, 44, 30);
+    ctx.fillRect(dx + 86, 138, 44, 30);
+    ctx.fillStyle = 'rgba(255,255,255,0.65)';
+    ctx.font = 'bold 11px Tahoma';
+    ctx.fillText(deskNames[idx], dx + 80, 192);
+  });
+
+  // โซนพักผ่อนซ้ายล่าง (Nap Zone)
+  ctx.fillStyle = 'rgba(49, 46, 129, 0.78)';
+  ctx.fillRect(45, 400, 175, 120);
+  ctx.strokeStyle = '#818cf8';
+  ctx.strokeRect(45, 400, 175, 120);
+  ctx.fillStyle = '#c7d2fe';
+  ctx.font = 'bold 12px Tahoma';
+  ctx.fillText('💤 Nap Zone (โซนงีบ)', 132, 425);
+  ctx.fillStyle = '#4338ca';
+  ctx.fillRect(70, 445, 125, 52);
+
+  // โซนประชุมกลาง
+  ctx.fillStyle = 'rgba(30, 41, 59, 0.85)';
+  ctx.fillRect(355, 345, 250, 170);
+  ctx.strokeStyle = '#64748b';
+  ctx.strokeRect(355, 345, 250, 170);
+  ctx.fillStyle = '#e2e8f0';
+  ctx.fillRect(410, 397, 140, 56);
+  ctx.fillStyle = '#475569';
+  ctx.font = 'bold 12px Tahoma';
+  ctx.fillText('💬 Meeting Table', 480, 429);
+
+  // โซนขนมและเครื่องดื่มขวาล่าง (Pantry Zone)
+  ctx.fillStyle = 'rgba(124, 45, 18, 0.78)';
+  ctx.fillRect(740, 400, 175, 120);
+  ctx.strokeStyle = '#fb923c';
+  ctx.strokeRect(740, 400, 175, 120);
+  ctx.fillStyle = '#fed7aa';
+  ctx.font = 'bold 12px Tahoma';
+  ctx.fillText('🍗 Pantry (โซนของกิน)', 827, 425);
+  ctx.fillStyle = '#fde68a';
+  ctx.fillRect(770, 445, 115, 50);
+
+  // ไฮไลต์โซนเมื่อเดินเข้าไปใกล้
+  const activeZone = getCurrentZone();
+  if (activeZone) {
+    ctx.save();
+    ctx.strokeStyle = '#38bdf8';
+    ctx.lineWidth = 2.5;
+    ctx.setLineDash([6, 4]);
+    ctx.strokeRect(activeZone.x - 4, activeZone.y - 4, activeZone.w + 8, activeZone.h + 8);
+    ctx.restore();
+  }
+}
+
+// 3. วาดตัวละครของคุณจาก Sprite Sheet
+function drawPlayer(time) {
+  let animKey = 'idle_down';
+  if (me.isMoving) {
+    animKey = 'walk_' + me.facing;
+  } else if (me.action !== 'idle') {
+    animKey = me.action;
+  } else {
+    animKey = 'idle_' + me.facing;
+  }
+
+  const anim = ANIMATIONS[animKey] || ANIMATIONS.idle_down;
+  const sheet = anim.s === 1 ? sheet1 : sheet2;
+  const scale = anim.s === 1 ? SCALE_S1 : SCALE_S2;
+
+  let frameIdx = 0;
+  if (animKey === 'sit') {
+    frameIdx = me.sitVariant % anim.frames.length;
+  } else if (anim.fps > 0 && anim.frames.length > 1) {
+    frameIdx = Math.floor((time / 1000) * anim.fps) % anim.frames.length;
+  }
+  const frame = anim.frames[frameIdx] || anim.frames[0];
+
+  ctx.save();
+  ctx.translate(me.x, me.y);
+
+  // เงาใต้เท้า
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.38)';
+  ctx.beginPath();
+  ctx.ellipse(0, 5, me.action === 'sleep' ? 32 : 22, 8, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  if (sheet && sheet.complete && sheet.naturalWidth > 0) {
+    const drawW = frame.w * scale;
+    const drawH = frame.h * scale;
+    const bobOffset = anim.bob ? Math.sin(time / 95) * 2.5 : 0;
+    const ox = (frame.ox || 0) * scale;
+
+    ctx.save();
+    if (anim.flipX) {
+      ctx.scale(-1, 1);
+    }
+    ctx.drawImage(
+      sheet,
+      frame.x, frame.y, frame.w, frame.h,
+      -drawW / 2 + ox, -drawH + 10 + bobOffset, drawW, drawH
+    );
+    ctx.restore();
+  }
+  ctx.restore();
+
+  // ป้ายชื่อเหนือหัว
+  ctx.save();
+  ctx.font = 'bold 13px Tahoma';
+  ctx.textAlign = 'center';
+  ctx.strokeStyle = '#000';
+  ctx.lineWidth = 3.5;
+  const labelY = me.y - 84;
+  ctx.strokeText(me.name, me.x, labelY);
+  ctx.fillStyle = '#fef08a';
+  ctx.fillText(me.name, me.x, labelY);
+  ctx.restore();
+}
+
+// 4. ระบบคำนวณการเดิน 4 ทิศทาง & โซนอัตโนมัติ
+const FACING_LABELS = {
+  down: 'หน้า (Front)',
+  up: 'หลัง (Back)',
+  left: 'ซ้าย (Left)',
+  right: 'ขวา (Right)'
+};
+
+function update(time) {
+  const speed = 3.3;
+  let dxKey = 0, dyKey = 0;
+
+  if (keys['w'] || keys['arrowup'])    dyKey -= 1;
+  if (keys['s'] || keys['arrowdown'])  dyKey += 1;
+  if (keys['a'] || keys['arrowleft'])  dxKey -= 1;
+  if (keys['d'] || keys['arrowright']) dxKey += 1;
+
+  if (dxKey !== 0 || dyKey !== 0) {
+    const len = Math.hypot(dxKey, dyKey);
+    me.x += (dxKey / len) * speed;
+    me.y += (dyKey / len) * speed;
+    me.targetX = me.x;
+    me.targetY = me.y;
+    me.isMoving = true;
+
+    if (Math.abs(dxKey) >= Math.abs(dyKey)) {
+      me.facing = dxKey > 0 ? 'right' : 'left';
+    } else {
+      me.facing = dyKey > 0 ? 'down' : 'up';
+    }
+
+    if (me.action !== 'idle') setAction('idle');
+    document.getElementById('statusText').textContent = 'กำลังเดิน...';
+  } else {
+    const dx = me.targetX - me.x;
+    const dy = me.targetY - me.y;
+    const dist = Math.hypot(dx, dy);
+
+    if (dist > 3) {
+      me.x += (dx / dist) * speed;
+      me.y += (dy / dist) * speed;
+      if (Math.abs(dx) >= Math.abs(dy)) {
+        me.facing = dx > 0 ? 'right' : 'left';
+      } else {
+        me.facing = dy > 0 ? 'down' : 'up';
+      }
+      me.isMoving = true;
+    } else {
+      if (me.isMoving && me.action === 'idle') {
+        document.getElementById('statusText').textContent = 'พร้อมลุยงาน (Idle)';
+      }
+      me.isMoving = false;
+    }
+  }
+
+  // ระบบ Auto-AFK: ถ้ายืนนิ่งเกิน 25 วินาที ให้ตัวละครงีบหลับอัตโนมัติ
+  if (!me.isMoving && me.action === 'idle' && time - me.lastActiveTime > 25000) {
+    setAction('sleep');
+  }
+
+  me.x = Math.max(40, Math.min(canvas.width - 40, me.x));
+  me.y = Math.max(120, Math.min(565, me.y));
+
+  document.getElementById('facingText').textContent = FACING_LABELS[me.facing] || me.facing;
+
+  const currentZone = getCurrentZone();
+  const hintEl = document.getElementById('zoneHint');
+  if (currentZone) {
+    hintEl.innerHTML = `📍 คุณอยู่ในโซน <b>${currentZone.name}</b> — <b>${currentZone.hint}</b> หรือกดปุ่มท่าทางด้านล่าง`;
+  } else {
+    hintEl.innerHTML = `🎮 กด <b>W A S D</b> / <b>ลูกศร</b> หรือ <b>คลิกพื้นไม้</b> เพื่อเดิน 4 ทิศทาง | กด <b>E</b> โต้ตอบกับจุดใกล้ตัว | กดปุ่มหรือ <b>เลข 1-9</b> เพื่อเปลี่ยนท่าทาง`;
+  }
+}
+
+function loop(time) {
+  update(time);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawOffice();
+  drawPlayer(time);
+  requestAnimationFrame(loop);
+}
+
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

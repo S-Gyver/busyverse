@@ -98,10 +98,16 @@ export function drawPlayer(ctx, charObj, sheets, time, isMainPlayer = true) {
     ctx.fill();
   }
 
-  const useModular = charObj.avatar && charObj.avatar.mode === 'modular';
+  const useModular = true; // ใช้โมเดลตัวละคร Local แบบ Modular 100%
 
   if (useModular) {
-    drawModularAvatar(ctx, charObj.avatar, sheets, time, {
+    const avatarConfig = charObj.avatar || {
+      mode: 'modular',
+      gender: 'male',
+      facing: charObj.facing,
+      hairStyle: 'none'
+    };
+    drawModularAvatar(ctx, avatarConfig, sheets, time, {
       isMoving: charObj.isMoving,
       isRunning: charObj.isRunning,
       action: charObj.action,

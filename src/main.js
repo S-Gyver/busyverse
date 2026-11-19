@@ -1,6 +1,14 @@
 import { EMOTE_BUTTONS, DEFAULT_GUIDE_HTML } from './config/officeZones.js';
 import { VirtualOfficeEngine } from './engine/VirtualOfficeEngine.js';
 import { drawModularAvatar, drawBaseBodyCard } from './engine/modularAvatarRenderer.js';
+import {
+  FACE_ITEMS,
+  HAIR_ITEMS,
+  TOP_ITEMS,
+  BOTTOM_ITEMS,
+  GLASSES_ITEMS,
+  HAT_ITEMS
+} from './config/avatarItemsConfig.js';
 
 const canvas = document.getElementById('officeCanvas');
 const statusDotEl = document.getElementById('statusDot');
@@ -14,8 +22,8 @@ const creatorOverlayEl = document.getElementById('creatorOverlay');
 const btnOpenCreator = document.getElementById('btnOpenCreator');
 const btnCloseCreator = document.getElementById('btnCloseCreator');
 const presetGridEl = document.getElementById('presetGrid');
+const costumeAccordionEl = document.getElementById('costumeAccordion');
 const charNameInput = document.getElementById('charNameInput');
-const costumeTabsEl = document.getElementById('costumeTabs');
 const costumeGridEl = document.getElementById('costumeGrid');
 const costumeCategoryLabel = document.getElementById('costumeCategoryLabel');
 const previewCanvas = document.getElementById('creatorPreviewCanvas');
@@ -24,14 +32,31 @@ const btnCreateConfirm = document.getElementById('btnCreateConfirm');
 const btnSpawnFriend = document.getElementById('btnSpawnFriend');
 const btnRandomize = document.getElementById('btnRandomize');
 
-// Step 1 State: เลือกเพศ (male / female) และทิศทางการหัน (down=หน้า, left=ซ้าย, right=ขวา, up=หลัง)
+// สถานะการปรับแต่งตัวละคร (Default: หุ่นพื้นฐาน)
 const draftAvatar = {
   mode: 'modular',
   gender: 'male',
-  facing: 'down'
+  facing: 'down',
+  hairStyle: 'none',
+  hairIndex: -1,
+  topIndex: -1,
+  bottomIndex: -1,
+  faceIndex: -1,
+  glassesIndex: -1,
+  hatIndex: -1
 };
 
 let previewPose = 'idle';
+let openAccordionId = 'hair'; // เปิดหมวด "ทรงผม" ไว้เป็นค่าเริ่มต้น
+
+const CUSTOMIZATION_CATEGORIES = [
+  { id: 'hair',    icon: '💇', label: 'ทรงผม (Hair)' },
+  { id: 'top',     icon: '👕', label: 'เสื้อผ้า (Tops)' },
+  { id: 'bottom',  icon: '👖', label: 'กางเกง (Bottoms)' },
+  { id: 'face',    icon: '😊', label: 'ใบหน้า (Face)' },
+  { id: 'glasses', icon: '👓', label: 'แว่นตา (Glasses)' },
+  { id: 'hat',     icon: '🎩', label: 'หมวก & ประดับ (Hats)' }
+];
 
 const GENDER_OPTIONS = [
   {
@@ -39,7 +64,7 @@ const GENDER_OPTIONS = [
     label: 'เพศชาย (Male)',
     profession: 'Male Character',
     race: 'Human (ชาย)',
-    desc: 'หุ่นมาตรฐานเพศชาย สามารถกดเลือกหันหน้า หันซ้าย หันขวา และหันหลังได้จากตารางฝั่งขวา',
+    desc: 'หุ่นมาตรฐานเพศชาย สามารถเลือกทรงผม เสื้อผ้า และหมุนดู 4 ทิศทางได้',
     stats: { str: 85, int: 75, agg: 80, dex: 75, hp: 90 }
   },
   {
@@ -47,7 +72,7 @@ const GENDER_OPTIONS = [
     label: 'เพศหญิง (Female)',
     profession: 'Female Character',
     race: 'Human (หญิง)',
-    desc: 'หุ่นมาตรฐานเพศหญิง สามารถกดเลือกหันหน้า หันซ้าย หันขวา และหันหลังได้จากตารางฝั่งขวา',
+    desc: 'หุ่นมาตรฐานเพศหญิง สามารถเลือกทรงผม เสื้อผ้า และหมุนดู 4 ทิศทางได้',
     stats: { str: 65, int: 90, agg: 60, dex: 90, hp: 85 }
   }
 ];
@@ -85,6 +110,7 @@ const engine = new VirtualOfficeEngine(canvas, {
   },
   onSheetsProgress() {
     renderGenderLeftPanel();
+    renderAccordion();
     renderDirectionRightPanel();
   }
 });
@@ -93,12 +119,6 @@ engine.npcs = [];
 engine.setCreatorOpen(true);
 
 if (btnRandomize) btnRandomize.style.display = 'none';
-
-costumeTabsEl.innerHTML = `
-  <button class="costume-tab active" data-cat="direction" style="grid-column: span 6;">
-    หมุนดูมุมหุ่นตัวละคร (หันหน้า / หันซ้าย / หันขวา / หันหลัง)
-  </button>
-`;
 
 function renderGenderLeftPanel() {
   presetGridEl.innerHTML = GENDER_OPTIONS.map(opt => {
@@ -114,6 +134,131 @@ function renderGenderLeftPanel() {
   GENDER_OPTIONS.forEach(opt => {
     const c = document.getElementById(`gender_card_${opt.gender}`);
     drawBaseBodyCard(c, opt.gender, 'down', engine.sheets);
+  });
+}
+
+function getCategoryBadge(catId) {
+  if (catId === 'hair') return 'หัวโล้น (Base)';
+  if (catId === 'top') return 'เสื้อเดิม (Base)';
+  if (catId === 'bottom') return 'กางเกงเดิม (Base)';
+  if (catId === 'face') return 'หน้าเดิม (Base)';
+  if (catId === 'glasses') return 'ไม่ใส่';
+  if (catId === 'hat') return 'ไม่ใส่';
+  return '';
+}
+
+function renderAccordion() {
+  if (!costumeAccordionEl) return;
+
+  costumeAccordionEl.innerHTML = CUSTOMIZATION_CATEGORIES.map(cat => {
+    const isOpen = openAccordionId === cat.id;
+    const badgeText = getCategoryBadge(cat.id);
+
+    let itemsHtml = '';
+    if (isOpen) {
+      if (cat.id === 'hair') {
+        itemsHtml = `
+          <div class="accordion-item-card active" data-type="hair" data-id="none">
+            <div style="font-size: 26px; height: 50px; display: flex; align-items: center; justify-content: center;">🧑‍🦲</div>
+            <div class="accordion-item-label">หัวโล้น (Base)</div>
+          </div>
+        `;
+      } else if (cat.id === 'top') {
+        itemsHtml = `
+          <div class="accordion-item-card active" data-type="top" data-id="-1">
+            <div style="font-size: 24px; height: 50px; display: flex; align-items: center; justify-content: center;">👕</div>
+            <div class="accordion-item-label">เสื้อกล้ามเดิม (Base)</div>
+          </div>
+        `;
+      } else if (cat.id === 'bottom') {
+        itemsHtml = `
+          <div class="accordion-item-card active" data-type="bottom" data-id="-1">
+            <div style="font-size: 24px; height: 50px; display: flex; align-items: center; justify-content: center;">🩳</div>
+            <div class="accordion-item-label">กางเกงเดิม (Base)</div>
+          </div>
+        `;
+      } else if (cat.id === 'face') {
+        itemsHtml = `
+          <div class="accordion-item-card active" data-type="face" data-id="-1">
+            <div style="font-size: 24px; height: 50px; display: flex; align-items: center; justify-content: center;">🙂</div>
+            <div class="accordion-item-label">ใบหน้าเดิม (Base)</div>
+          </div>
+        `;
+      } else if (cat.id === 'glasses') {
+        itemsHtml = `
+          <div class="accordion-item-card active" data-type="glasses" data-id="-1">
+            <div style="font-size: 24px; height: 50px; display: flex; align-items: center; justify-content: center;">❌</div>
+            <div class="accordion-item-label">ไม่ใส่แว่น</div>
+          </div>
+        `;
+      } else if (cat.id === 'hat') {
+        itemsHtml = `
+          <div class="accordion-item-card active" data-type="hat" data-id="-1">
+            <div style="font-size: 24px; height: 50px; display: flex; align-items: center; justify-content: center;">❌</div>
+            <div class="accordion-item-label">ไม่ใส่หมวก</div>
+          </div>
+        `;
+      }
+    }
+
+    return `
+      <div class="accordion-group${isOpen ? ' open' : ''}" data-cat="${cat.id}">
+        <button class="accordion-header" type="button">
+          <div class="accordion-header-left">
+            <span>${cat.icon}</span>
+            <span>${cat.label}</span>
+          </div>
+          <div class="accordion-header-right">
+            <span class="accordion-badge">${badgeText}</span>
+            <span class="accordion-chevron">▼</span>
+          </div>
+        </button>
+        ${isOpen ? `<div class="accordion-body"><div class="accordion-grid">${itemsHtml}</div></div>` : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+// คลิกเปิด/ปิด Accordion หรือเลือกไอเทม
+if (costumeAccordionEl) {
+  costumeAccordionEl.addEventListener('click', e => {
+    // 1. คลิกที่ Header เพื่อสลับหมวด (Accordion Dropdown)
+    const header = e.target.closest('.accordion-header');
+    if (header) {
+      const group = header.closest('.accordion-group');
+      if (group && group.dataset.cat) {
+        const catId = group.dataset.cat;
+        // ถ้านึกอันเดิมที่เปิดอยู่จะพับเก็บ ถ้าเลือกอันใหม่จะเปิดอันนั้นแล้วเก็บอันอื่นทั้งหมด
+        openAccordionId = openAccordionId === catId ? null : catId;
+        renderAccordion();
+      }
+      return;
+    }
+
+    // 2. คลิกเลือกไอเทมในการ์ดย่อย
+    const itemCard = e.target.closest('.accordion-item-card');
+    if (itemCard && itemCard.dataset.type && itemCard.dataset.id !== undefined) {
+      const type = itemCard.dataset.type;
+      const idVal = itemCard.dataset.id;
+
+      if (type === 'hair') {
+        draftAvatar.hairStyle = 'none';
+        draftAvatar.hairIndex = -1;
+      } else if (type === 'top') {
+        draftAvatar.topIndex = parseInt(idVal, 10);
+      } else if (type === 'bottom') {
+        draftAvatar.bottomIndex = parseInt(idVal, 10);
+      } else if (type === 'face') {
+        draftAvatar.faceIndex = parseInt(idVal, 10);
+      } else if (type === 'glasses') {
+        draftAvatar.glassesIndex = parseInt(idVal, 10);
+      } else if (type === 'hat') {
+        draftAvatar.hatIndex = parseInt(idVal, 10);
+      }
+
+      renderAccordion();
+      renderDirectionRightPanel();
+    }
   });
 }
 
@@ -133,7 +278,7 @@ function renderDirectionRightPanel() {
 
   FACING_DIRECTIONS.forEach(f => {
     const c = document.getElementById(`dir_thumb_${f.dir}`);
-    drawBaseBodyCard(c, draftAvatar.gender, f.dir, engine.sheets);
+    drawBaseBodyCard(c, draftAvatar.gender, f.dir, engine.sheets, draftAvatar);
   });
 }
 
@@ -145,6 +290,7 @@ function selectGender(gender) {
   if (loreEl) loreEl.textContent = opt.desc;
 
   renderGenderLeftPanel();
+  renderAccordion();
   renderDirectionRightPanel();
 }
 
@@ -182,6 +328,7 @@ function openCreator() {
   creatorOverlayEl.classList.remove('hidden');
   engine.setCreatorOpen(true);
   renderGenderLeftPanel();
+  renderAccordion();
   renderDirectionRightPanel();
 }
 

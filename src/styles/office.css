@@ -32,33 +32,37 @@ body {
 /* Top HUD ในออฟฟิศ */
 .top-hud {
   position: absolute;
-  top: 16px;
-  left: 24px;
-  right: 24px;
+  top: clamp(8px, 1.5vh, 16px);
+  left: clamp(10px, 2vw, 24px);
+  right: clamp(10px, 2vw, 24px);
   display: flex;
   justify-content: space-between;
   align-items: center;
   pointer-events: none;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .top-hud-right {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   pointer-events: auto;
+  flex-wrap: wrap;
 }
 
 .status-badge {
   background: rgba(15, 23, 42, 0.9);
   border: 1.5px solid #475569;
   border-radius: 999px;
-  padding: 8px 18px;
-  font-size: 14px;
+  padding: clamp(6px, 1vh, 8px) clamp(10px, 1.5vw, 18px);
+  font-size: clamp(12px, 1vw, 14px);
   color: #f8fafc;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+  white-space: nowrap;
 }
 
 .open-creator-btn {
@@ -66,12 +70,13 @@ body {
   border: 1.5px solid #fde68a;
   color: #0f172a;
   font-weight: bold;
-  font-size: 14px;
-  padding: 8px 18px;
+  font-size: clamp(12px, 1vw, 14px);
+  padding: clamp(6px, 1vh, 8px) clamp(12px, 1.5vw, 18px);
   border-radius: 999px;
   cursor: pointer;
   box-shadow: 0 4px 14px rgba(245, 158, 11, 0.45);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
+  white-space: nowrap;
 }
 
 .open-creator-btn:hover {
@@ -90,41 +95,48 @@ body {
 /* Bottom Action & Emote Bar ในออฟฟิศ */
 .hud-bottom {
   position: absolute;
-  bottom: 16px;
+  bottom: clamp(8px, 1.5vh, 16px);
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   width: 96%;
   max-width: 1200px;
+  pointer-events: none;
+}
+
+.hud-bottom > * {
+  pointer-events: auto;
 }
 
 .emote-bar {
   background: rgba(15, 23, 42, 0.94);
   border: 1.5px solid #475569;
   border-radius: 14px;
-  padding: 8px 12px;
+  padding: clamp(6px, 1vh, 8px) clamp(8px, 1.2vw, 12px);
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 8px;
+  gap: clamp(4px, 0.6vw, 8px);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.65);
+  max-width: 100%;
 }
 
 .emote-btn {
   background: #1e293b;
   border: 1px solid #334155;
   color: #e2e8f0;
-  padding: 7px 13px;
-  border-radius: 9px;
-  font-size: 13px;
+  padding: clamp(5px, 0.8vh, 7px) clamp(8px, 1vw, 13px);
+  border-radius: 8px;
+  font-size: clamp(11.5px, 0.95vw, 13px);
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   transition: all 0.15s ease;
+  white-space: nowrap;
 }
 
 .emote-btn:hover {
@@ -143,9 +155,9 @@ body {
 
 .emote-btn kbd {
   background: rgba(0, 0, 0, 0.35);
-  padding: 2px 6px;
+  padding: 2px 5px;
   border-radius: 4px;
-  font-size: 11px;
+  font-size: 10.5px;
   color: #94a3b8;
 }
 
@@ -167,7 +179,7 @@ body {
 }
 
 /* =========================================================
-   RPG CHARACTER CREATOR SCREEN (สมดุลเต็มจอ Full HD)
+   RPG CHARACTER CREATOR SCREEN (Responsive ทุกขนาดหน้าจอ)
    ========================================================= */
 .creator-overlay {
   position: absolute;
@@ -179,6 +191,8 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  height: 100vh;
+  height: 100dvh;
 }
 
 .creator-overlay.hidden {
@@ -198,29 +212,31 @@ body {
 }
 
 .creator-topbar {
-  height: 60px;
-  background: rgba(15, 23, 42, 0.78);
+  height: clamp(48px, 6vh, 60px);
+  background: rgba(15, 23, 42, 0.82);
   border-bottom: 1px solid rgba(148, 163, 184, 0.35);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 32px;
+  padding: 0 clamp(16px, 2.5vw, 32px);
   z-index: 2;
+  flex-shrink: 0;
 }
 
 .creator-back-btn {
   background: rgba(255, 255, 255, 0.14);
   border: 1.5px solid rgba(255, 255, 255, 0.3);
   color: #fff;
-  padding: 8px 20px;
+  padding: clamp(6px, 1vh, 8px) clamp(12px, 1.5vw, 20px);
   border-radius: 8px;
-  font-size: 17px;
+  font-size: clamp(13px, 1.2vw, 16px);
   font-weight: bold;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   transition: background 0.15s ease;
+  white-space: nowrap;
 }
 
 .creator-back-btn:hover {
@@ -230,27 +246,30 @@ body {
 .creator-body {
   flex: 1;
   display: grid;
-  grid-template-columns: 380px 1fr 440px;
-  padding: 24px 36px 28px;
-  gap: 32px;
+  grid-template-columns: minmax(240px, 320px) minmax(280px, 1fr) minmax(280px, 380px);
+  padding: clamp(8px, 1.5vh, 20px) clamp(12px, 2vw, 32px);
+  gap: clamp(10px, 1.5vw, 24px);
   z-index: 2;
   min-height: 0;
-  max-width: 1820px;
+  max-width: 1720px;
   width: 100%;
   margin: 0 auto;
+  overflow: hidden;
+  align-items: stretch;
 }
 
 .panel-section-title {
-  font-size: 18px;
+  font-size: clamp(14px, 1.2vw, 18px);
   font-weight: bold;
   color: #f8fafc;
-  padding-bottom: 8px;
-  margin-bottom: 14px;
+  padding-bottom: clamp(4px, 0.8vh, 8px);
+  margin-bottom: clamp(6px, 1.2vh, 12px);
   border-bottom: 2.5px solid #38bdf8;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.65);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-shrink: 0;
 }
 
 /* ฝั่งซ้าย: เลือกตัวละคร + ตั้งชื่อ */
@@ -261,23 +280,26 @@ body {
   background: rgba(15, 23, 42, 0.38);
   border: 1.5px solid rgba(148, 163, 184, 0.25);
   border-radius: 14px;
-  padding: 20px 22px;
+  padding: clamp(10px, 1.5vh, 18px) clamp(10px, 1.5vw, 18px);
   backdrop-filter: blur(6px);
-  align-self: start;
+  min-height: 0;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .preset-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 14px;
-  margin-bottom: 18px;
+  gap: clamp(8px, 1.2vw, 12px);
+  margin-bottom: clamp(8px, 1.4vh, 16px);
 }
 
 .preset-card {
   width: 100%;
-  height: 175px;
+  height: clamp(110px, 17vh, 165px);
   background: linear-gradient(180deg, #ffffff 0%, #e2e8f0 100%);
-  border: 3px solid #475569;
+  border: 2.5px solid #475569;
   border-radius: 12px;
   cursor: pointer;
   position: relative;
@@ -286,83 +308,105 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 6px 8px;
+  padding: clamp(4px, 0.8vh, 8px) 4px;
   transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .preset-card:hover {
-  transform: translateY(-3px);
+  transform: translateY(-2px);
   border-color: #0284c7;
 }
 
 .preset-card.active {
   border-color: #f43f5e;
-  box-shadow: 0 0 18px rgba(244, 63, 94, 0.85);
+  box-shadow: 0 0 16px rgba(244, 63, 94, 0.85);
   background: linear-gradient(180deg, #fff1f2 0%, #ffe4e6 100%);
 }
 
+.preset-card canvas {
+  max-width: 100%;
+  height: auto;
+  max-height: clamp(75px, 12vh, 120px);
+  object-fit: contain;
+}
+
 .preset-card-name {
-  font-size: 13.5px;
+  font-size: clamp(11px, 1.05vw, 13px);
   font-weight: bold;
   color: #0f172a;
   background: rgba(255, 255, 255, 0.92);
   border-radius: 6px;
-  width: 94%;
+  width: 96%;
   text-align: center;
-  padding: 5px 4px;
+  padding: 3px 2px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .name-input-box {
-  margin-bottom: 14px;
+  width: 100%;
+  max-width: 380px;
+  background: rgba(15, 23, 42, 0.75);
+  border: 1.5px solid rgba(148, 163, 184, 0.35);
+  border-radius: 12px;
+  padding: clamp(6px, 1vh, 10px) clamp(12px, 1.5vw, 16px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+  flex-shrink: 0;
+  backdrop-filter: blur(8px);
 }
 
 .name-input-box label {
   display: block;
-  font-size: 13.5px;
+  font-size: clamp(11.5px, 1vw, 13px);
   font-weight: bold;
   color: #e2e8f0;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
 }
 
 .name-input-box input {
   width: 100%;
-  background: rgba(15, 23, 42, 0.85);
-  border: 2px solid #38bdf8;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1.5px solid #38bdf8;
   border-radius: 8px;
-  padding: 10px 14px;
+  padding: clamp(6px, 0.9vh, 8px) 12px;
   color: #fef08a;
-  font-size: 16px;
+  font-size: clamp(13px, 1.1vw, 15px);
   font-weight: bold;
   outline: none;
+  transition: all 0.15s ease;
+}
+
+.name-input-box input:focus {
+  border-color: #fde047;
+  box-shadow: 0 0 12px rgba(253, 224, 71, 0.4);
 }
 
 .stats-box {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: 10px;
+  margin-bottom: 14px;
   background: rgba(15, 23, 42, 0.45);
-  padding: 16px;
+  padding: 12px;
   border-radius: 10px;
   border: 1px solid rgba(148, 163, 184, 0.2);
 }
 
 .stat-row {
   display: grid;
-  grid-template-columns: 92px 1fr;
+  grid-template-columns: 80px 1fr;
   align-items: center;
-  gap: 12px;
-  font-size: 14px;
+  gap: 10px;
+  font-size: 13px;
   font-weight: bold;
   color: #e2e8f0;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
 }
 
 .stat-bar-bg {
-  height: 16px;
+  height: 14px;
   background: rgba(15, 23, 42, 0.85);
   border: 1px solid rgba(148, 163, 184, 0.4);
   border-radius: 4px;
@@ -378,29 +422,29 @@ body {
 .profession-box {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   background: rgba(15, 23, 42, 0.72);
   border: 1.5px solid rgba(148, 163, 184, 0.35);
   border-radius: 10px;
-  padding: 12px 16px;
+  padding: 10px 14px;
 }
 
 .profession-shield {
-  width: 48px;
-  height: 52px;
+  width: 42px;
+  height: 46px;
   background: linear-gradient(135deg, #fde68a, #ca8a04);
-  border: 2.5px solid #fff;
-  border-radius: 8px 8px 22px 22px;
+  border: 2px solid #fff;
+  border-radius: 8px 8px 20px 20px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
+  font-size: 20px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
 }
 
 .profession-info {
-  font-size: 14.5px;
-  line-height: 1.5;
+  font-size: 13px;
+  line-height: 1.45;
 }
 
 .profession-info b {
@@ -414,29 +458,37 @@ body {
   align-items: center;
   justify-content: space-between;
   position: relative;
-  padding: 6px 0;
+  padding: 2px 0;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+  gap: clamp(4px, 1vh, 10px);
 }
 
 .preview-controls {
   display: flex;
-  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: clamp(4px, 0.8vw, 8px);
   background: rgba(15, 23, 42, 0.75);
-  padding: 7px 14px;
+  padding: clamp(4px, 0.8vh, 6px) clamp(8px, 1.2vw, 12px);
   border-radius: 999px;
   border: 1.5px solid rgba(255, 255, 255, 0.25);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  flex-shrink: 0;
 }
 
 .preview-ctrl-btn {
   background: transparent;
   border: 1.5px solid transparent;
   color: #e2e8f0;
-  font-size: 14px;
+  font-size: clamp(11.5px, 1.05vw, 13.5px);
   font-weight: bold;
-  padding: 6px 16px;
+  padding: clamp(4px, 0.7vh, 6px) clamp(8px, 1.2vw, 14px);
   border-radius: 999px;
   cursor: pointer;
   transition: all 0.15s ease;
+  white-space: nowrap;
 }
 
 .preview-ctrl-btn:hover,
@@ -447,134 +499,295 @@ body {
 }
 
 .pedestal-stage {
-  position: relative;
-  width: 460px;
-  height: 520px;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  max-width: 460px;
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+  overflow: hidden;
 }
 
 #creatorPreviewCanvas {
-  position: relative;
+  max-height: 100%;
+  max-width: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  aspect-ratio: 460 / 520;
+  display: block;
   z-index: 2;
+  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.45));
 }
 
 .lore-box {
+  flex-shrink: 0;
   width: 100%;
-  max-width: 540px;
+  max-width: 500px;
   background: rgba(15, 20, 15, 0.78);
   border: 1.5px solid rgba(255, 255, 255, 0.2);
   border-radius: 10px;
-  padding: 14px 20px;
-  font-size: 14.5px;
+  padding: clamp(6px, 1.1vh, 12px) clamp(10px, 1.4vw, 18px);
+  font-size: clamp(11px, 1.05vw, 13.5px);
   color: #fde68a;
-  line-height: 1.55;
-  min-height: 80px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  line-height: 1.45;
+  min-height: auto;
+  max-height: clamp(50px, 9.5vh, 75px);
+  overflow-y: auto;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
 }
 
 /* ฝั่งขวา: เลือกคอสตูม + ปุ่มสร้าง */
 .creator-right {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  justify-content: space-between;
   min-height: 0;
-  gap: 16px;
+  height: 100%;
+  max-height: 100%;
+  gap: clamp(8px, 1.2vh, 12px);
   background: rgba(15, 23, 42, 0.38);
   border: 1.5px solid rgba(148, 163, 184, 0.25);
   border-radius: 14px;
-  padding: 20px 22px;
+  padding: clamp(10px, 1.5vh, 18px) clamp(10px, 1.5vw, 18px);
   backdrop-filter: blur(6px);
-  align-self: start;
+  overflow: hidden;
 }
 
 .creator-right > div:first-child {
   display: flex;
   flex-direction: column;
+  flex: 1;
   min-height: 0;
+  overflow: hidden;
 }
 
 .costume-panel {
+  flex: 1;
+  min-height: 0;
   background: rgba(241, 245, 249, 0.92);
   border: 2px solid rgba(255, 255, 255, 0.75);
   border-radius: 12px;
-  padding: 14px;
+  padding: clamp(8px, 1.2vh, 12px);
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+  gap: clamp(6px, 1vh, 10px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
 }
 
-.costume-tabs {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 5px;
+/* =========================================================
+   ACCORDION DROPDOWN STYLES (คอสตูม & เครื่องแต่งกาย)
+   ========================================================= */
+.costume-accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
 }
 
-.costume-tab {
-  background: #334155;
+.accordion-group {
+  border: 1.5px solid rgba(148, 163, 184, 0.25);
+  background: rgba(15, 23, 42, 0.65);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.accordion-group.open {
+  border-color: #38bdf8;
+  background: rgba(15, 23, 42, 0.9);
+  box-shadow: 0 4px 14px rgba(56, 189, 248, 0.25);
+}
+
+.accordion-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 9px 12px;
+  background: transparent;
   border: none;
-  color: #e2e8f0;
-  padding: 9px 6px;
-  border-radius: 7px;
+  color: #f1f5f9;
   font-size: 13px;
   font-weight: bold;
   cursor: pointer;
-  text-align: center;
+  text-align: left;
+  user-select: none;
+  transition: background 0.15s ease;
 }
 
-.costume-tab.active {
-  background: #0284c7;
-  color: #fff;
-  box-shadow: 0 0 10px rgba(2, 132, 199, 0.6);
+.accordion-header:hover {
+  background: rgba(255, 255, 255, 0.08);
 }
 
-.costume-grid {
+.accordion-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.accordion-header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.accordion-badge {
+  font-size: 10.5px;
+  color: #fde68a;
+  background: rgba(245, 158, 11, 0.25);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  padding: 2px 7px;
+  border-radius: 999px;
+  white-space: nowrap;
+  max-width: 115px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.accordion-chevron {
+  font-size: 10px;
+  color: #94a3b8;
+  transition: transform 0.2s ease;
+}
+
+.accordion-group.open .accordion-chevron {
+  transform: rotate(180deg);
+  color: #38bdf8;
+}
+
+.accordion-body {
+  display: none;
+  padding: 8px;
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+  background: rgba(10, 15, 28, 0.55);
+}
+
+.accordion-group.open .accordion-body {
+  display: block;
+}
+
+.accordion-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-auto-rows: auto;
-  gap: 12px;
-  max-height: 520px;
+  gap: 8px;
+  max-height: 200px;
   overflow-y: auto;
-  overflow-x: hidden;
-  padding: 4px;
+  padding: 2px;
 }
 
-.costume-item-card {
+.accordion-grid::-webkit-scrollbar {
+  width: 5px;
+}
+.accordion-grid::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.4);
+}
+.accordion-grid::-webkit-scrollbar-thumb {
+  background: #38bdf8;
+  border-radius: 3px;
+}
+
+.accordion-item-card {
   background: linear-gradient(180deg, #ffffff 0%, #e2e8f0 100%);
-  border: 3px solid #64748b;
-  border-radius: 12px;
+  border: 2px solid #64748b;
+  border-radius: 8px;
   cursor: pointer;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 10px 8px;
+  gap: 4px;
+  padding: 6px 4px;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.accordion-item-card:hover {
+  transform: translateY(-2px);
+  border-color: #0284c7;
+}
+
+.accordion-item-card.active {
+  border-color: #f43f5e;
+  box-shadow: 0 0 12px rgba(244, 63, 94, 0.78);
+  background: linear-gradient(180deg, #fff1f2 0%, #ffe4e6 100%);
+}
+
+.accordion-item-card canvas {
+  max-width: 100%;
+  height: auto;
+  max-height: 65px;
+  object-fit: contain;
+}
+
+.accordion-item-label {
+  font-size: 11px;
+  font-weight: bold;
+  color: #0f172a;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 4px;
+  padding: 2px 4px;
+  text-align: center;
+  width: 96%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.costume-grid {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(6px, 1vh, 10px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 2px;
+}
+
+.costume-item-card {
+  background: linear-gradient(180deg, #ffffff 0%, #e2e8f0 100%);
+  border: 2.5px solid #64748b;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: clamp(4px, 0.8vh, 8px) 4px;
   transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .costume-item-card:hover {
-  transform: translateY(-3px);
+  transform: translateY(-2px);
   border-color: #0284c7;
 }
 
 .costume-item-card.active {
   border-color: #f43f5e;
-  box-shadow: 0 0 16px rgba(244, 63, 94, 0.78);
+  box-shadow: 0 0 14px rgba(244, 63, 94, 0.78);
   background: linear-gradient(180deg, #fff1f2 0%, #ffe4e6 100%);
 }
 
+.costume-item-card canvas {
+  max-width: 100%;
+  height: auto;
+  max-height: clamp(75px, 12vh, 130px);
+  object-fit: contain;
+}
+
 .costume-item-label {
-  font-size: 13.5px;
+  font-size: clamp(10.5px, 0.95vw, 12.5px);
   font-weight: bold;
   color: #0f172a;
   background: rgba(255, 255, 255, 0.92);
-  border-radius: 6px;
-  padding: 5px 6px;
+  border-radius: 5px;
+  padding: 3px 4px;
   text-align: center;
-  width: 94%;
+  width: 96%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -582,7 +795,10 @@ body {
 
 .creator-action-btns {
   display: flex;
-  gap: 12px;
+  gap: 10px;
+  flex-shrink: 0;
+  margin-top: auto;
+  padding-top: 4px;
 }
 
 .btn-create-gold {
@@ -590,31 +806,242 @@ body {
   background: linear-gradient(180deg, #fbbf24 0%, #d97706 100%);
   border: 2px solid #fef08a;
   color: #fff;
-  font-size: 18px;
+  font-size: clamp(14px, 1.2vw, 17px);
   font-weight: bold;
-  padding: 13px 16px;
+  padding: clamp(8px, 1.4vh, 12px) 14px;
   border-radius: 10px;
   cursor: pointer;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-  box-shadow: 0 6px 18px rgba(217, 119, 6, 0.55);
+  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.55);
+  transition: transform 0.1s ease, filter 0.15s ease;
 }
 
 .btn-create-gold:hover {
   filter: brightness(1.08);
+  transform: translateY(-1px);
 }
 
 .btn-spawn-friend {
   background: linear-gradient(180deg, #0ea5e9 0%, #0284c7 100%);
   border: 2px solid #bae6fd;
   color: #fff;
-  font-size: 14.5px;
+  font-size: clamp(12px, 1vw, 14px);
   font-weight: bold;
-  padding: 13px 16px;
+  padding: clamp(8px, 1.4vh, 12px) 14px;
   border-radius: 10px;
   cursor: pointer;
   white-space: nowrap;
+  transition: transform 0.1s ease, filter 0.15s ease;
 }
 
 .btn-spawn-friend:hover {
   filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+/* Custom sleek scrollbar for panels */
+.creator-left::-webkit-scrollbar,
+.costume-grid::-webkit-scrollbar,
+.lore-box::-webkit-scrollbar,
+.creator-body::-webkit-scrollbar,
+.emote-bar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.creator-left::-webkit-scrollbar-track,
+.costume-grid::-webkit-scrollbar-track,
+.lore-box::-webkit-scrollbar-track,
+.creator-body::-webkit-scrollbar-track,
+.emote-bar::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.4);
+  border-radius: 4px;
+}
+.creator-left::-webkit-scrollbar-thumb,
+.costume-grid::-webkit-scrollbar-thumb,
+.lore-box::-webkit-scrollbar-thumb,
+.creator-body::-webkit-scrollbar-thumb,
+.emote-bar::-webkit-scrollbar-thumb {
+  background: #38bdf8;
+  border-radius: 4px;
+}
+
+/* =========================================================
+   RESPONSIVE MEDIA QUERIES
+   ========================================================= */
+
+/* จอขนาดกลาง / แล็ปท็อปขนาดเล็ก (Width <= 1180px) */
+@media (max-width: 1180px) {
+  .creator-body {
+    grid-template-columns: 240px 1fr 280px;
+    gap: 12px;
+    padding: 10px 16px;
+  }
+  .creator-topbar span:last-child {
+    display: none;
+  }
+}
+
+/* จอแท็บเล็ตแนวตั้งหรือหน้าจอแคบ (Width <= 860px) */
+@media (max-width: 860px) {
+  .creator-overlay {
+    overflow-y: auto;
+  }
+  .creator-body {
+    display: flex;
+    flex-direction: column;
+    overflow-y: visible;
+    height: auto;
+    padding: 12px;
+    gap: 16px;
+  }
+  .creator-center {
+    order: 1;
+    height: auto;
+    max-height: none;
+  }
+  .pedestal-stage {
+    height: 320px;
+    max-height: 340px;
+  }
+  .creator-left {
+    order: 2;
+    height: auto;
+    max-height: none;
+    overflow: visible;
+  }
+  .creator-right {
+    order: 3;
+    height: auto;
+    max-height: none;
+    overflow: visible;
+  }
+  .costume-grid {
+    grid-template-columns: repeat(4, 1fr);
+    max-height: 240px;
+  }
+  .creator-action-btns {
+    position: sticky;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.95);
+    padding: 10px 0;
+    z-index: 10;
+  }
+}
+
+/* จอมือถือขนาดเล็ก (Width <= 540px) */
+@media (max-width: 540px) {
+  .top-hud {
+    top: 8px;
+    left: 8px;
+    right: 8px;
+    gap: 6px;
+  }
+  .status-badge {
+    padding: 5px 10px;
+    font-size: 11.5px;
+  }
+  .open-creator-btn {
+    padding: 5px 12px;
+    font-size: 11.5px;
+  }
+  .hud-bottom {
+    bottom: 8px;
+    width: 98%;
+  }
+  .guide-text {
+    font-size: 11px;
+    padding: 4px 10px;
+  }
+  .emote-bar {
+    padding: 4px 6px;
+    gap: 4px;
+    max-width: 100vw;
+    overflow-x: auto;
+    justify-content: flex-start;
+  }
+  .emote-btn {
+    padding: 5px 8px;
+    font-size: 11px;
+  }
+  .costume-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .costume-tab {
+    font-size: 10px;
+    padding: 5px 2px;
+  }
+  .pedestal-stage {
+    height: 240px;
+  }
+}
+
+/* จอแนวตั้งเตี้ย (Viewport Height <= 740px เช่น โน้ตบุ๊ก 768p ที่มี Browser Toolbar) */
+@media (max-height: 740px) and (min-width: 861px) {
+  .creator-topbar {
+    height: 44px;
+    padding: 0 16px;
+  }
+  .creator-back-btn {
+    padding: 4px 12px;
+    font-size: 13px;
+  }
+  .creator-body {
+    padding: 6px 16px;
+    gap: 10px;
+  }
+  .panel-section-title {
+    font-size: 14px;
+    margin-bottom: 6px;
+    padding-bottom: 4px;
+  }
+  .preset-card {
+    height: 105px;
+    padding: 4px;
+  }
+  .preset-card-name {
+    font-size: 11px;
+    padding: 2px;
+  }
+  .name-input-box {
+    margin-bottom: 6px;
+  }
+  .name-input-box input {
+    padding: 5px 8px;
+    font-size: 13px;
+  }
+  .preview-controls {
+    padding: 3px 8px;
+  }
+  .preview-ctrl-btn {
+    font-size: 11px;
+    padding: 3px 8px;
+  }
+  .pedestal-stage {
+    max-height: 46vh;
+  }
+  .lore-box {
+    font-size: 11px;
+    line-height: 1.35;
+    padding: 6px 10px;
+    max-height: 48px;
+  }
+  .costume-panel {
+    padding: 6px;
+    gap: 6px;
+  }
+  .costume-item-card {
+    padding: 4px;
+  }
+  .costume-item-card canvas {
+    max-height: 80px;
+  }
+  .costume-item-label {
+    font-size: 11px;
+    padding: 2px;
+  }
+  .btn-create-gold,
+  .btn-spawn-friend {
+    padding: 7px 12px;
+    font-size: 13px;
+  }
 }

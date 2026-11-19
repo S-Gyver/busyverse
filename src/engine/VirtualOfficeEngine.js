@@ -18,7 +18,7 @@ export class VirtualOfficeEngine {
     this.keys = {};
     this.rafId = null;
     this.isCreatorOpen = false;
-    this.loadInfo = { loaded: 0, total: 20, isReady: false };
+    this.loadInfo = { loaded: 0, total: 8, isReady: false };
 
     this.me = {
       name: 'คุณ (Lead)',
@@ -35,15 +35,10 @@ export class VirtualOfficeEngine {
       pantryVariant: 0,
       lastActiveTime: performance.now(),
       avatar: {
-        mode: 'classic',
+        mode: 'modular',
         gender: 'male',
-        bodyIndex: 1,
-        face: 0,
-        hair: 0,
-        top: 0,
-        bottom: 0,
-        glasses: 0,
-        hat: -1
+        facing: 'down',
+        hairStyle: 'none'
       }
     };
 

@@ -1,21 +1,5 @@
-// พิกัด URL ของ Sprite Sheet ทั้ง 15 แผ่นบน Cloudinary CDN
-export const SHEET_FILES = {
-  walk_front:      'https://res.cloudinary.com/xn7rvu6g/image/upload/f_auto,q_auto/v1795048611/visual_sprites/d6rfsncdancflzbykzen.png',
-  walk_back:       'https://res.cloudinary.com/xn7rvu6g/image/upload/f_auto,q_auto/v1795048628/visual_sprites/mibiqtke4f78vubmheba.png',
-  walk_right_life: 'https://res.cloudinary.com/xn7rvu6g/image/upload/f_auto,q_auto/v1795057987/visual_sprites/gmtquyjxekreb3ctgnic.png',
-  run_side:        'https://res.cloudinary.com/xn7rvu6g/image/upload/f_auto,q_auto/v1795050460/visual_sprites/b2yk3llvqmdq3sk9n5ry.png',
-  sit:             'https://res.cloudinary.com/xn7rvu6g/image/upload/f_auto,q_auto/v1795048635/visual_sprites/wifzpohzbext59iogl2p.png',
-  sleep:           'https://res.cloudinary.com/xn7rvu6g/image/upload/f_auto,q_auto/v1795048637/visual_sprites/vkp1ww52tcp2gnxh1a06.png',
-  victory:         'https://res.cloudinary.com/xn7rvu6g/image/upload/f_auto,q_auto/v1795048640/visual_sprites/ndaqgfskwq2cum8imlz3.png',
-  angry:           'https://res.cloudinary.com/xn7rvu6g/image/upload/f_auto,q_auto/v1795048644/visual_sprites/xg2ohglmqyab1geeweqw.png',
-  laugh:           'https://res.cloudinary.com/xn7rvu6g/image/upload/f_auto,q_auto/v1795048647/visual_sprites/fgrmqlfb1nuenmtqcrfv.png',
-  eat_chicken:     'https://res.cloudinary.com/xn7rvu6g/image/upload/f_auto,q_auto/v1795048652/visual_sprites/ybj4qmbkuo6jpah2rx62.png',
-  drink_water:     'https://res.cloudinary.com/xn7rvu6g/image/upload/f_auto,q_auto/v1795048657/visual_sprites/zqak5clnndsmz2i57sob.png',
-  eat_fruit:       'https://res.cloudinary.com/xn7rvu6g/image/upload/f_auto,q_auto/v1795048661/visual_sprites/f3utiiw5yqfpfxzi6bo7.png',
-  angry_talk:      'https://res.cloudinary.com/xn7rvu6g/image/upload/f_auto,q_auto/v1795048665/visual_sprites/v6hauujnxwx4razkqe2t.png',
-  serious_talk:    'https://res.cloudinary.com/xn7rvu6g/image/upload/f_auto,q_auto/v1795048668/visual_sprites/ukjyhiwgzywdbfmnnjcl.png',
-  normal_talk:     'https://res.cloudinary.com/xn7rvu6g/image/upload/f_auto,q_auto/v1795048672/visual_sprites/ufymg5dq4gwukhmmlecm.png'
-};
+// ระบบใช้ภาพตัวละคร Local ทั้งหมดจาก assets/ (ไม่มีการดึงภาพจาก Cloudinary)
+export const SHEET_FILES = {};
 
 // พิกัดเฟรมและอัตราส่วนภาพของทั้ง 14 แผ่น
 export const ANIMATIONS = {

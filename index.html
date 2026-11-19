@@ -43,7 +43,7 @@
     </div>
 
     <div class="creator-body">
-      <!-- ฝั่งซ้าย: เลือกตัวละคร + ตั้งชื่อ -->
+      <!-- ฝั่งซ้าย: เลือกตัวละคร + คอสตูม Accordion -->
       <div class="creator-left">
         <div>
           <div class="panel-section-title">
@@ -51,20 +51,25 @@
           </div>
           <div class="preset-grid" id="presetGrid"></div>
 
-          <div class="name-input-box">
-            <label for="charNameInput">ชื่อตัวละคร:</label>
-            <input type="text" id="charNameInput" value="คุณ (Lead)" maxlength="22" />
+          <div class="panel-section-title" style="margin-top: 14px;">
+            <span>คอสตูม & เครื่องแต่งกาย</span>
           </div>
+          <div class="costume-accordion" id="costumeAccordion"></div>
         </div>
       </div>
 
-      <!-- ตรงกลาง: แท่นยืนตัวละคร + คำอธิบาย -->
+      <!-- ตรงกลาง: แท่นยืนตัวละคร + ชื่อตัวละคร + คำอธิบาย -->
       <div class="creator-center">
         <div class="preview-controls">
           <button class="preview-ctrl-btn active" data-pose="idle">● ยืนพรีวิว</button>
           <button class="preview-ctrl-btn" data-pose="walk">▶ ทดสอบเดิน</button>
           <button class="preview-ctrl-btn" data-pose="run">▶▶ ทดสอบวิ่ง</button>
           <button class="preview-ctrl-btn" id="btnRandomize">🎲 สุ่มชุด</button>
+        </div>
+
+        <div class="name-input-box">
+          <label for="charNameInput">ชื่อตัวละคร:</label>
+          <input type="text" id="charNameInput" value="คุณ (Lead)" maxlength="22" />
         </div>
 
         <div class="pedestal-stage">
@@ -76,23 +81,15 @@
         </div>
       </div>
 
-      <!-- ฝั่งขวา: เลือกคอสตูม + ปุ่มสร้าง -->
+      <!-- ฝั่งขวา: มุมมอง 4 ทิศทาง + ปุ่มสร้าง -->
       <div class="creator-right">
         <div>
           <div class="panel-section-title">
-            <span>เลือกคอสตูม</span>
-            <span id="costumeCategoryLabel" style="font-size: 11.5px; color: #fde68a;">ทรงผม (10)</span>
+            <span>มุมมอง 4 ทิศทาง</span>
+            <span id="costumeCategoryLabel" style="font-size: 11.5px; color: #fde68a;">เพศชาย (4 ทิศทาง)</span>
           </div>
 
           <div class="costume-panel">
-            <div class="costume-tabs" id="costumeTabs">
-              <button class="costume-tab active" data-cat="hair">💇 ผม</button>
-              <button class="costume-tab" data-cat="top">👕 เสื้อ</button>
-              <button class="costume-tab" data-cat="bottom">👖 กางเกง</button>
-              <button class="costume-tab" data-cat="face">😊 หน้า</button>
-              <button class="costume-tab" data-cat="glasses">👓 แว่น</button>
-              <button class="costume-tab" data-cat="hat">🎩 หมวก</button>
-            </div>
             <div class="costume-grid" id="costumeGrid"></div>
           </div>
         </div>

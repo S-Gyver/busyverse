@@ -1,19 +1,16 @@
-// ไฟล์รูปหุ่นพื้นฐานแยกตามหมวดในโฟลเดอร์ ./assets/body/male และ ./assets/body/female
+// ไฟล์รูปหุ่นพื้นฐาน Local 100% (8 มุมมอง มาตรฐาน)
 export const MODULAR_SHEET_FILES = {
-  male_front:   './assets/body/male/front.png',
-  male_right:   './assets/body/male/right.png',
-  male_left:    './assets/body/male/left.png',
-  male_back:    './assets/body/male/back.png',
-  female_front: './assets/body/female/front.png',
-  female_left:  './assets/body/female/left.png',
-  female_right: './assets/body/female/right.png',
-  female_back:  './assets/body/female/back.png',
-  mod_base:    'https://res.cloudinary.com/xn7rvu6g/image/upload/f_auto,q_auto/v1795064884/visual_sprites/r3xq5y9vmfinq0txrtt1.png',
-  mod_hair:    'https://res.cloudinary.com/xn7rvu6g/image/upload/f_auto,q_auto/v1795062377/visual_sprites/yd135fysx762bzvacit7.png',
-  mod_tops:    'https://res.cloudinary.com/xn7rvu6g/image/upload/f_auto,q_auto/v1795061533/visual_sprites/x3t81uykojfvxapjk4ax.png',
-  mod_bottoms: 'https://res.cloudinary.com/xn7rvu6g/image/upload/f_auto,q_auto/v1795061537/visual_sprites/ihxzx6z4htssebj20abo.png',
-  mod_acc:     'https://res.cloudinary.com/xn7rvu6g/image/upload/f_auto,q_auto/v1795062415/visual_sprites/ophrvudwhij0o1r0g6ke.png'
+  male_front:   './assets/characters/male/body/front.png',
+  male_right:   './assets/characters/male/body/right.png',
+  male_left:    './assets/characters/male/body/left.png',
+  male_back:    './assets/characters/male/body/back.png',
+  female_front: './assets/characters/female/body/front.png',
+  female_left:  './assets/characters/female/body/left.png',
+  female_right: './assets/characters/female/body/right.png',
+  female_back:  './assets/characters/female/body/back.png'
 };
+
+export const HAIR_4WAY_STYLES = {};
 
 // ตัวเลือกตัวละครหลัก (6 ช่องฝั่งซ้าย "เลือกตัวละคร")
 export const CHARACTER_PRESETS = [
@@ -91,7 +88,7 @@ export const CHARACTER_PRESETS = [
   }
 ];
 
-// พิกัดไฟล์หุ่นมาตรฐาน 8 ไฟล์จากโฟลเดอร์ ./assets/body/
+// พิกัดไฟล์หุ่นมาตรฐาน 8 ไฟล์จากโฟลเดอร์ ./assets/characters/[gender]/body/
 export const BODY_FILE_MAP = {
   male: {
     down:  'male_front',

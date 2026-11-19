@@ -1,8 +1,7 @@
 import { BODY_FILE_MAP } from '../config/avatarItemsConfig.js';
 
 /**
- * Step 1: วาดหุ่นพื้นฐานจากไฟล์เดี่ยวในโฟลเดอร์ ./body/1.png .. 8.png
- * (1-4: ชาย หน้า/ขวา/ซ้าย/หลัง, 5-8: หญิง หน้า/ซ้าย/ขวา/หลัง)
+ * วาดหุ่นตัวละครพื้นฐาน 4 ทิศทาง (Local 100%)
  */
 export function drawModularAvatar(ctx, avatar, sheets, time, state = {}) {
   const isMoving = Boolean(state.isMoving);
@@ -38,6 +37,7 @@ export function drawModularAvatar(ctx, avatar, sheets, time, state = {}) {
   const targetW = (img.naturalWidth / img.naturalHeight) * targetH;
   const footY = 12;
 
+  // วาดหุ่น Base Body
   ctx.drawImage(
     img,
     -targetW / 2,
@@ -53,7 +53,7 @@ export function drawModularAvatar(ctx, avatar, sheets, time, state = {}) {
 /**
  * วาดรูปพรีวิวหุ่นลงในการ์ดเลือกเพศ / การ์ดหันทิศทาง (หันหน้า, หันซ้าย, หันขวา, หันหลัง)
  */
-export function drawBaseBodyCard(canvas, gender, facingDir, sheets) {
+export function drawBaseBodyCard(canvas, gender, facingDir, sheets, avatar = null) {
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   const w = canvas.width;
@@ -72,6 +72,8 @@ export function drawBaseBodyCard(canvas, gender, facingDir, sheets) {
   );
   const dw = img.naturalWidth * scale;
   const dh = img.naturalHeight * scale;
+  const dx = (w - dw) / 2;
+  const dy = (h - dh) / 2;
 
-  ctx.drawImage(img, (w - dw) / 2, (h - dh) / 2, dw, dh);
+  ctx.drawImage(img, dx, dy, dw, dh);
 }

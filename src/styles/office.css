@@ -1,0 +1,620 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Tahoma', 'Segoe UI', sans-serif;
+}
+
+body {
+  background: #0f131c;
+  color: #fff;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  user-select: none;
+}
+
+.office-frame {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background: #1a2030;
+  overflow: hidden;
+}
+
+.office-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+/* Top HUD ในออฟฟิศ */
+.top-hud {
+  position: absolute;
+  top: 16px;
+  left: 24px;
+  right: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+}
+
+.top-hud-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  pointer-events: auto;
+}
+
+.status-badge {
+  background: rgba(15, 23, 42, 0.9);
+  border: 1.5px solid #475569;
+  border-radius: 999px;
+  padding: 8px 18px;
+  font-size: 14px;
+  color: #f8fafc;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+}
+
+.open-creator-btn {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  border: 1.5px solid #fde68a;
+  color: #0f172a;
+  font-weight: bold;
+  font-size: 14px;
+  padding: 8px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.45);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.open-creator-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(245, 158, 11, 0.65);
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 8px #22c55e;
+}
+
+/* Bottom Action & Emote Bar ในออฟฟิศ */
+.hud-bottom {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 96%;
+  max-width: 1200px;
+}
+
+.emote-bar {
+  background: rgba(15, 23, 42, 0.94);
+  border: 1.5px solid #475569;
+  border-radius: 14px;
+  padding: 8px 12px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.65);
+}
+
+.emote-btn {
+  background: #1e293b;
+  border: 1px solid #334155;
+  color: #e2e8f0;
+  padding: 7px 13px;
+  border-radius: 9px;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+
+.emote-btn:hover {
+  background: #334155;
+  border-color: #64748b;
+  transform: translateY(-2px);
+}
+
+.emote-btn.active {
+  background: #0284c7;
+  border-color: #38bdf8;
+  color: #fff;
+  font-weight: bold;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.45);
+}
+
+.emote-btn kbd {
+  background: rgba(0, 0, 0, 0.35);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.emote-btn.active kbd {
+  color: #e0f2fe;
+}
+
+.guide-text {
+  background: rgba(15, 23, 42, 0.88);
+  border: 1px solid #334155;
+  border-radius: 999px;
+  padding: 6px 18px;
+  font-size: 13px;
+  color: #cbd5e1;
+}
+
+.guide-text b {
+  color: #38bdf8;
+}
+
+/* =========================================================
+   RPG CHARACTER CREATOR SCREEN (สมดุลเต็มจอ Full HD)
+   ========================================================= */
+.creator-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  background:
+    radial-gradient(circle at 50% 15%, rgba(254, 249, 195, 0.45) 0%, transparent 50%),
+    linear-gradient(180deg, #1b4353 0%, #2d6a6e 48%, #4d7c42 76%, #274422 100%);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.creator-overlay.hidden {
+  display: none;
+}
+
+.creator-overlay::before {
+  content: '';
+  position: absolute;
+  top: -100px;
+  left: 38%;
+  width: 340px;
+  height: 1100px;
+  background: linear-gradient(180deg, rgba(255, 255, 230, 0.24) 0%, rgba(255, 255, 230, 0.02) 100%);
+  transform: rotate(-16deg);
+  pointer-events: none;
+}
+
+.creator-topbar {
+  height: 60px;
+  background: rgba(15, 23, 42, 0.78);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  z-index: 2;
+}
+
+.creator-back-btn {
+  background: rgba(255, 255, 255, 0.14);
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  padding: 8px 20px;
+  border-radius: 8px;
+  font-size: 17px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: background 0.15s ease;
+}
+
+.creator-back-btn:hover {
+  background: rgba(255, 255, 255, 0.26);
+}
+
+.creator-body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 380px 1fr 440px;
+  padding: 24px 36px 28px;
+  gap: 32px;
+  z-index: 2;
+  min-height: 0;
+  max-width: 1820px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.panel-section-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #f8fafc;
+  padding-bottom: 8px;
+  margin-bottom: 14px;
+  border-bottom: 2.5px solid #38bdf8;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.65);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* ฝั่งซ้าย: เลือกตัวละคร + ตั้งชื่อ */
+.creator-left {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  background: rgba(15, 23, 42, 0.38);
+  border: 1.5px solid rgba(148, 163, 184, 0.25);
+  border-radius: 14px;
+  padding: 20px 22px;
+  backdrop-filter: blur(6px);
+  align-self: start;
+}
+
+.preset-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.preset-card {
+  width: 100%;
+  height: 175px;
+  background: linear-gradient(180deg, #ffffff 0%, #e2e8f0 100%);
+  border: 3px solid #475569;
+  border-radius: 12px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 6px 8px;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.preset-card:hover {
+  transform: translateY(-3px);
+  border-color: #0284c7;
+}
+
+.preset-card.active {
+  border-color: #f43f5e;
+  box-shadow: 0 0 18px rgba(244, 63, 94, 0.85);
+  background: linear-gradient(180deg, #fff1f2 0%, #ffe4e6 100%);
+}
+
+.preset-card-name {
+  font-size: 13.5px;
+  font-weight: bold;
+  color: #0f172a;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 6px;
+  width: 94%;
+  text-align: center;
+  padding: 5px 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.name-input-box {
+  margin-bottom: 14px;
+}
+
+.name-input-box label {
+  display: block;
+  font-size: 13.5px;
+  font-weight: bold;
+  color: #e2e8f0;
+  margin-bottom: 6px;
+}
+
+.name-input-box input {
+  width: 100%;
+  background: rgba(15, 23, 42, 0.85);
+  border: 2px solid #38bdf8;
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: #fef08a;
+  font-size: 16px;
+  font-weight: bold;
+  outline: none;
+}
+
+.stats-box {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+  background: rgba(15, 23, 42, 0.45);
+  padding: 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.stat-row {
+  display: grid;
+  grid-template-columns: 92px 1fr;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #e2e8f0;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+}
+
+.stat-bar-bg {
+  height: 16px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.stat-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #0284c7, #38bdf8);
+  transition: width 0.25s ease;
+}
+
+.profession-box {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(15, 23, 42, 0.72);
+  border: 1.5px solid rgba(148, 163, 184, 0.35);
+  border-radius: 10px;
+  padding: 12px 16px;
+}
+
+.profession-shield {
+  width: 48px;
+  height: 52px;
+  background: linear-gradient(135deg, #fde68a, #ca8a04);
+  border: 2.5px solid #fff;
+  border-radius: 8px 8px 22px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+}
+
+.profession-info {
+  font-size: 14.5px;
+  line-height: 1.5;
+}
+
+.profession-info b {
+  color: #a3e635;
+}
+
+/* ตรงกลาง: แท่นยืนตัวละคร + คำอธิบายด้านล่าง */
+.creator-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  padding: 6px 0;
+}
+
+.preview-controls {
+  display: flex;
+  gap: 10px;
+  background: rgba(15, 23, 42, 0.75);
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.preview-ctrl-btn {
+  background: transparent;
+  border: 1.5px solid transparent;
+  color: #e2e8f0;
+  font-size: 14px;
+  font-weight: bold;
+  padding: 6px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.preview-ctrl-btn:hover,
+.preview-ctrl-btn.active {
+  background: rgba(56, 189, 248, 0.28);
+  border-color: #38bdf8;
+  color: #fff;
+}
+
+.pedestal-stage {
+  position: relative;
+  width: 460px;
+  height: 520px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#creatorPreviewCanvas {
+  position: relative;
+  z-index: 2;
+}
+
+.lore-box {
+  width: 100%;
+  max-width: 540px;
+  background: rgba(15, 20, 15, 0.78);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  padding: 14px 20px;
+  font-size: 14.5px;
+  color: #fde68a;
+  line-height: 1.55;
+  min-height: 80px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+/* ฝั่งขวา: เลือกคอสตูม + ปุ่มสร้าง */
+.creator-right {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  min-height: 0;
+  gap: 16px;
+  background: rgba(15, 23, 42, 0.38);
+  border: 1.5px solid rgba(148, 163, 184, 0.25);
+  border-radius: 14px;
+  padding: 20px 22px;
+  backdrop-filter: blur(6px);
+  align-self: start;
+}
+
+.creator-right > div:first-child {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.costume-panel {
+  background: rgba(241, 245, 249, 0.92);
+  border: 2px solid rgba(255, 255, 255, 0.75);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+}
+
+.costume-tabs {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 5px;
+}
+
+.costume-tab {
+  background: #334155;
+  border: none;
+  color: #e2e8f0;
+  padding: 9px 6px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  text-align: center;
+}
+
+.costume-tab.active {
+  background: #0284c7;
+  color: #fff;
+  box-shadow: 0 0 10px rgba(2, 132, 199, 0.6);
+}
+
+.costume-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: auto;
+  gap: 12px;
+  max-height: 520px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 4px;
+}
+
+.costume-item-card {
+  background: linear-gradient(180deg, #ffffff 0%, #e2e8f0 100%);
+  border: 3px solid #64748b;
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 8px;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.costume-item-card:hover {
+  transform: translateY(-3px);
+  border-color: #0284c7;
+}
+
+.costume-item-card.active {
+  border-color: #f43f5e;
+  box-shadow: 0 0 16px rgba(244, 63, 94, 0.78);
+  background: linear-gradient(180deg, #fff1f2 0%, #ffe4e6 100%);
+}
+
+.costume-item-label {
+  font-size: 13.5px;
+  font-weight: bold;
+  color: #0f172a;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 6px;
+  padding: 5px 6px;
+  text-align: center;
+  width: 94%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.creator-action-btns {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-create-gold {
+  flex: 1;
+  background: linear-gradient(180deg, #fbbf24 0%, #d97706 100%);
+  border: 2px solid #fef08a;
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
+  padding: 13px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 6px 18px rgba(217, 119, 6, 0.55);
+}
+
+.btn-create-gold:hover {
+  filter: brightness(1.08);
+}
+
+.btn-spawn-friend {
+  background: linear-gradient(180deg, #0ea5e9 0%, #0284c7 100%);
+  border: 2px solid #bae6fd;
+  color: #fff;
+  font-size: 14.5px;
+  font-weight: bold;
+  padding: 13px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-spawn-friend:hover {
+  filter: brightness(1.08);
+}

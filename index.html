@@ -3,794 +3,109 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TEAM 3P - Virtual Office (Full 14-Sheet Smooth Sprite Pack)</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tahoma', 'Segoe UI', sans-serif; }
-    body {
-      background: #0f131c;
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      overflow: hidden;
-      user-select: none;
-      gap: 10px;
-    }
-    .office-frame {
-      position: relative;
-      background: #1a2030;
-      border: 3px solid #334155;
-      border-radius: 14px;
-      box-shadow: 0 20px 55px rgba(0,0,0,0.8);
-      overflow: hidden;
-    }
-    canvas { display: block; cursor: pointer; }
-
-    /* Top HUD */
-    .top-hud {
-      position: absolute;
-      top: 12px;
-      left: 14px;
-      right: 14px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      pointer-events: none;
-    }
-    .status-badge {
-      background: rgba(15, 23, 42, 0.88);
-      border: 1.5px solid #475569;
-      border-radius: 999px;
-      padding: 6px 14px;
-      font-size: 12.5px;
-      color: #f8fafc;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-    }
-    .status-dot {
-      width: 9px;
-      height: 9px;
-      border-radius: 50%;
-      background: #22c55e;
-      box-shadow: 0 0 8px #22c55e;
-    }
-
-    /* Bottom Action & Emote Bar */
-    .hud-bottom {
-      position: absolute;
-      bottom: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      width: 97%;
-      max-width: 940px;
-    }
-    .emote-bar {
-      background: rgba(15, 23, 42, 0.94);
-      border: 1.5px solid #475569;
-      border-radius: 12px;
-      padding: 6px 8px;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 5px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.65);
-    }
-    .emote-btn {
-      background: #1e293b;
-      border: 1px solid #334155;
-      color: #e2e8f0;
-      padding: 5px 9px;
-      border-radius: 8px;
-      font-size: 11.5px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      transition: all 0.15s ease;
-    }
-    .emote-btn:hover {
-      background: #334155;
-      border-color: #64748b;
-      transform: translateY(-2px);
-    }
-    .emote-btn.active {
-      background: #0284c7;
-      border-color: #38bdf8;
-      color: #fff;
-      font-weight: bold;
-      box-shadow: 0 0 12px rgba(56, 189, 248, 0.45);
-    }
-    .emote-btn kbd {
-      background: rgba(0,0,0,0.35);
-      padding: 1px 5px;
-      border-radius: 4px;
-      font-size: 10px;
-      color: #94a3b8;
-    }
-    .emote-btn.active kbd {
-      color: #e0f2fe;
-    }
-    .guide-text {
-      background: rgba(15, 23, 42, 0.85);
-      border: 1px solid #334155;
-      border-radius: 999px;
-      padding: 4px 14px;
-      font-size: 11.5px;
-      color: #cbd5e1;
-    }
-    .guide-text b { color: #38bdf8; }
-  </style>
+  <title>TEAM 3P - Virtual Office & Character Creator</title>
+  <link rel="stylesheet" href="./src/styles/office.css" />
 </head>
 <body>
 
 <div class="office-frame">
-  <canvas id="officeCanvas" width="960" height="640"></canvas>
+  <canvas id="officeCanvas" class="office-canvas" width="960" height="640"></canvas>
 
+  <!-- Top HUD ในออฟฟิศ -->
   <div class="top-hud">
     <div class="status-badge">
       <span class="status-dot" id="statusDot"></span>
-      <span>สถานะ: <b id="statusText">กำลังโหลดชุดภาพ (0/14)...</b></span>
+      <span>สถานะ: <b id="statusText">กำลังโหลดชุดภาพ...</b></span>
     </div>
-    <div class="status-badge">
-      <span>ทิศทาง: <b id="facingText">หน้า (Front)</b></span>
+    <div class="top-hud-right">
+      <div class="status-badge">
+        <span>ทิศทาง: <b id="facingText">หน้า (Front)</b></span>
+      </div>
+      <button class="open-creator-btn" id="btnOpenCreator">🎨 สร้าง / แต่งตัวละคร</button>
     </div>
   </div>
 
+  <!-- Bottom Action & Emote Bar ในออฟฟิศ -->
   <div class="hud-bottom">
-    <div class="guide-text" id="zoneHint">
-      🎮 กด <b>W A S D</b> / <b>ลูกศร</b> หรือ <b>คลิกพื้นไม้</b> เพื่อเดิน 4 ทิศทาง | กด <b>E</b> โต้ตอบกับจุดใกล้ตัว | กดปุ่มด้านล่างหรือ <b>เลข 0-9</b> เพื่อเปลี่ยนท่าทาง
+    <div class="guide-text" id="zoneHint"></div>
+    <div class="emote-bar" id="emoteBar"></div>
+  </div>
+
+  <!-- หน้าจอสร้างตัวละครสไตล์ RPG (เปิดขึ้นมาให้ทดลองสร้างทันที) -->
+  <div class="creator-overlay" id="creatorOverlay">
+    <div class="creator-topbar">
+      <button class="creator-back-btn" id="btnCloseCreator">
+        <span>《</span> <span>สร้างตัวละคร</span>
+      </button>
+      <span style="font-size: 12px; color: #e2e8f0;">
+        ✨ ผสมทรงผม เสื้อ กางเกง ใบหน้า แว่น หมวก ได้มากกว่า 10,000 รูปแบบ
+      </span>
     </div>
-    <div class="emote-bar" id="emoteBar">
-      <button class="emote-btn active" data-action="idle"><kbd>0</kbd> 🧍 ยืนปกติ</button>
-      <button class="emote-btn" data-action="normal_talk"><kbd>1</kbd> 💬 คุยปกติ</button>
-      <button class="emote-btn" data-action="serious_talk"><kbd>2</kbd> 🧐 คุยจริงจัง</button>
-      <button class="emote-btn" data-action="angry_talk"><kbd>3</kbd> 🤬 เถียงงาน</button>
-      <button class="emote-btn" data-action="sit"><kbd>4</kbd> 🪑 นั่ง (3 ท่า)</button>
-      <button class="emote-btn" data-action="eat_chicken"><kbd>5</kbd> 🍗 กินไก่ทอด</button>
-      <button class="emote-btn" data-action="eat_fruit"><kbd>6</kbd> 🍎 กินผลไม้</button>
-      <button class="emote-btn" data-action="drink_water"><kbd>7</kbd> 🥤 ดื่มน้ำ</button>
-      <button class="emote-btn" data-action="laugh"><kbd>8</kbd> 😂 หัวเราะ</button>
-      <button class="emote-btn" data-action="angry"><kbd>9</kbd> 😡 หัวร้อน</button>
-      <button class="emote-btn" data-action="victory"><kbd>V</kbd> ✌️ ชนะ/สำเร็จ</button>
-      <button class="emote-btn" data-action="sleep"><kbd>Z</kbd> 💤 นอนหลับ</button>
+
+    <div class="creator-body">
+      <!-- ฝั่งซ้าย: เลือกตัวละคร + ตั้งชื่อ -->
+      <div class="creator-left">
+        <div>
+          <div class="panel-section-title">
+            <span>เลือกตัวละคร</span>
+          </div>
+          <div class="preset-grid" id="presetGrid"></div>
+
+          <div class="name-input-box">
+            <label for="charNameInput">ชื่อตัวละคร:</label>
+            <input type="text" id="charNameInput" value="คุณ (Lead)" maxlength="22" />
+          </div>
+        </div>
+      </div>
+
+      <!-- ตรงกลาง: แท่นยืนตัวละคร + คำอธิบาย -->
+      <div class="creator-center">
+        <div class="preview-controls">
+          <button class="preview-ctrl-btn active" data-pose="idle">● ยืนพรีวิว</button>
+          <button class="preview-ctrl-btn" data-pose="walk">▶ ทดสอบเดิน</button>
+          <button class="preview-ctrl-btn" data-pose="run">▶▶ ทดสอบวิ่ง</button>
+          <button class="preview-ctrl-btn" id="btnRandomize">🎲 สุ่มชุด</button>
+        </div>
+
+        <div class="pedestal-stage">
+          <canvas id="creatorPreviewCanvas" width="460" height="520"></canvas>
+        </div>
+
+        <div class="lore-box" id="loreDesc">
+          สายลุยโค้ดแนวหน้า ถนัดการแก้บั๊กระยะประชิด มีความอึดและพละกำลังในการปั่นงานสูงมาก
+        </div>
+      </div>
+
+      <!-- ฝั่งขวา: เลือกคอสตูม + ปุ่มสร้าง -->
+      <div class="creator-right">
+        <div>
+          <div class="panel-section-title">
+            <span>เลือกคอสตูม</span>
+            <span id="costumeCategoryLabel" style="font-size: 11.5px; color: #fde68a;">ทรงผม (10)</span>
+          </div>
+
+          <div class="costume-panel">
+            <div class="costume-tabs" id="costumeTabs">
+              <button class="costume-tab active" data-cat="hair">💇 ผม</button>
+              <button class="costume-tab" data-cat="top">👕 เสื้อ</button>
+              <button class="costume-tab" data-cat="bottom">👖 กางเกง</button>
+              <button class="costume-tab" data-cat="face">😊 หน้า</button>
+              <button class="costume-tab" data-cat="glasses">👓 แว่น</button>
+              <button class="costume-tab" data-cat="hat">🎩 หมวก</button>
+            </div>
+            <div class="costume-grid" id="costumeGrid"></div>
+          </div>
+        </div>
+
+        <div class="creator-action-btns">
+          <button class="btn-create-gold" id="btnCreateConfirm">สร้าง</button>
+          <button class="btn-spawn-friend" id="btnSpawnFriend" title="เสกตัวละครชุดนี้เพิ่มลงในห้องออฟฟิศ">➕ เพิ่มเพื่อนในห้อง</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
-<script>
-const canvas = document.getElementById('officeCanvas');
-const ctx = canvas.getContext('2d');
-
-// 1. โหลด Sprite Sheet ทั้ง 14 แผ่น (ไฟล์ .png ที่ลบพื้นหลังและเงาพื้นออกเรียบร้อยแล้ว)
-const SHEET_FILES = {
-  walk_front:      'walk_front.png',
-  walk_back:       'walk_back.png',
-  walk_right_life: 'walk_right_life.png',
-  sit:             'sit.png',
-  sleep:           'sleep.png',
-  victory:         'victory.png',
-  angry:           'angry.png',
-  laugh:           'laugh.png',
-  eat_chicken:     'eat_chicken.png',
-  drink_water:     'drink_water.png',
-  eat_fruit:       'eat_fruit.png',
-  angry_talk:      'angry_talk.png',
-  serious_talk:    'serious_talk.png',
-  normal_talk:     'normal_talk.png'
-};
-
-const SHEETS = {};
-const totalSheets = Object.keys(SHEET_FILES).length;
-let loadedCount = 0;
-
-function updateLoadStatus() {
-  loadedCount = Object.values(SHEETS).filter(img => img.complete && img.naturalWidth > 0).length;
-  const statusEl = document.getElementById('statusText');
-  if (loadedCount >= totalSheets) {
-    if (me.action === 'idle' && !me.isMoving) {
-      statusEl.textContent = 'พร้อมลุยงาน (Idle)';
-    }
-  } else {
-    statusEl.textContent = `กำลังโหลดชุดภาพ (${loadedCount}/${totalSheets})...`;
-  }
-}
-
-Object.entries(SHEET_FILES).forEach(([key, src]) => {
-  const img = new Image();
-  img.onload = updateLoadStatus;
-  img.onerror = updateLoadStatus;
-  img.src = src;
-  SHEETS[key] = img;
-});
-
-// พิกัดเฟรมและอัตราส่วนภาพของทั้ง 14 แผ่น (พร้อมค่า ox ล็อกจุดศูนย์กลางลำตัวไม่ให้ส่ายเวลามีกล่องข้อความ)
-const ANIMATIONS = {
-  // ท่ายืนนิ่ง 4 ทิศทาง (ใช้เฟรมแรกของแต่ละทิศ)
-  idle_down: {
-    sheet: 'walk_front', scale: 0.315, fps: 0,
-    frames: [{ x: 33, y: 115, w: 137, h: 256 }]
-  },
-  idle_up: {
-    sheet: 'walk_back', scale: 0.301, fps: 0,
-    frames: [{ x: 35, y: 97, w: 129, h: 272 }]
-  },
-  idle_right: {
-    sheet: 'walk_right_life', scale: 0.192, fps: 0,
-    frames: [{ x: 35, y: 140, w: 183, h: 428 }]
-  },
-  idle_left: {
-    sheet: 'walk_right_life', scale: 0.192, fps: 0, flipX: true,
-    frames: [{ x: 35, y: 140, w: 183, h: 428 }]
-  },
-
-  // ท่าเดิน 4 ทิศทาง (6 เฟรมต่อเนื่อง สมูทครบทุกจังหวะก้าวขา)
-  walk_down: {
-    sheet: 'walk_front', scale: 0.315, fps: 10,
-    frames: [
-      { x: 198, y: 114, w: 127, h: 265, ox: 4 },
-      { x: 350, y: 105, w: 152, h: 272, ox: 17 },
-      { x: 528, y: 118, w: 143, h: 261, ox: 4 },
-      { x: 703, y: 112, w: 137, h: 270 },
-      { x: 864, y: 106, w: 148, h: 272, ox: 14 },
-      { x: 1031, y: 116, w: 137, h: 261 }
-    ]
-  },
-  walk_up: {
-    sheet: 'walk_back', scale: 0.301, fps: 10,
-    frames: [
-      { x: 184, y: 97, w: 129, h: 270 },
-      { x: 349, y: 92, w: 149, h: 280, ox: 7 },
-      { x: 531, y: 97, w: 139, h: 272 },
-      { x: 698, y: 97, w: 129, h: 273 },
-      { x: 858, y: 92, w: 150, h: 280, ox: -5 },
-      { x: 1037, y: 97, w: 129, h: 273 }
-    ]
-  },
-  walk_right: {
-    sheet: 'walk_right_life', scale: 0.192, fps: 11,
-    frames: [
-      { x: 236, y: 137, w: 214, h: 427, ox: -3 },
-      { x: 468, y: 140, w: 210, h: 434, ox: 4 },
-      { x: 690, y: 140, w: 184, h: 434 },
-      { x: 896, y: 140, w: 182, h: 429 },
-      { x: 1131, y: 140, w: 222, h: 426, ox: 7 },
-      { x: 1385, y: 140, w: 181, h: 420 },
-      { x: 1579, y: 140, w: 182, h: 429 }
-    ]
-  },
-  walk_left: {
-    sheet: 'walk_right_life', scale: 0.192, fps: 11, flipX: true,
-    frames: [
-      { x: 236, y: 137, w: 214, h: 427, ox: -3 },
-      { x: 468, y: 140, w: 210, h: 434, ox: 4 },
-      { x: 690, y: 140, w: 184, h: 434 },
-      { x: 896, y: 140, w: 182, h: 429 },
-      { x: 1131, y: 140, w: 222, h: 426, ox: 7 },
-      { x: 1385, y: 140, w: 181, h: 420 },
-      { x: 1579, y: 140, w: 182, h: 429 }
-    ]
-  },
-
-  // ท่าพูดคุย 3 อารมณ์ (5 เฟรม)
-  normal_talk: {
-    sheet: 'normal_talk', scale: 0.199, fps: 3.2, label: '💬 กำลังคุยงานทั่วไป (Normal Talk)',
-    frames: [
-      { x: 134, y: 140, w: 313, h: 415, ox: 71 },
-      { x: 469, y: 141, w: 310, h: 414, ox: 63 },
-      { x: 800, y: 136, w: 309, h: 419, ox: 65 },
-      { x: 1149, y: 145, w: 200, h: 410 },
-      { x: 1479, y: 142, w: 281, h: 413, ox: 43 }
-    ]
-  },
-  serious_talk: {
-    sheet: 'serious_talk', scale: 0.177, fps: 3, label: '🧐 ประชุมเครียด/จริงจัง (Serious Talk)',
-    frames: [
-      { x: 69, y: 104, w: 350, h: 463, ox: 78 },
-      { x: 451, y: 104, w: 330, h: 464, ox: 52 },
-      { x: 780, y: 105, w: 328, h: 463, ox: 62 },
-      { x: 1130, y: 102, w: 323, h: 467, ox: 45 },
-      { x: 1455, y: 98, w: 312, h: 470, ox: 41 }
-    ]
-  },
-  angry_talk: {
-    sheet: 'angry_talk', scale: 0.180, fps: 3.8, label: '🤬 เถียงงานเดือด! (Angry Talk)',
-    frames: [
-      { x: 82, y: 98, w: 348, h: 455, ox: 80 },
-      { x: 438, y: 98, w: 312, h: 455, ox: 47 },
-      { x: 749, y: 92, w: 349, h: 461, ox: 20 },
-      { x: 1140, y: 90, w: 357, h: 463, ox: 83 },
-      { x: 1499, y: 98, w: 265, h: 455, ox: 14 }
-    ]
-  },
-
-  // ท่านั่งพัก 3 สไตล์
-  sit: {
-    sheet: 'sit', scale: 0.203, fps: 0, label: '🪑 นั่งพักผ่อน (Sit - กดซ้ำเพื่อเปลี่ยนท่านั่ง)',
-    frames: [
-      { x: 87, y: 97, w: 318, h: 349 },
-      { x: 513, y: 92, w: 216, h: 353, ox: -6 },
-      { x: 868, y: 80, w: 234, h: 370 }
-    ]
-  },
-
-  // ท่ากินและดื่ม (5 เฟรม)
-  eat_chicken: {
-    sheet: 'eat_chicken', scale: 0.165, fps: 3.2, label: '🍗 กำลังกินไก่ทอดกรอบๆ (Eat Chicken)',
-    frames: [
-      { x: 25, y: 124, w: 307, h: 436, ox: -22 },
-      { x: 382, y: 124, w: 303, h: 436, ox: -21 },
-      { x: 773, y: 132, w: 272, h: 428, ox: -6 },
-      { x: 1072, y: 124, w: 315, h: 436 },
-      { x: 1445, y: 124, w: 300, h: 436, ox: -18 }
-    ]
-  },
-  eat_fruit: {
-    sheet: 'eat_fruit', scale: 0.151, fps: 3.2, label: '🍎 กำลังกินผลไม้สดชื่น (Eat Fruit)',
-    frames: [
-      { x: 35, y: 95, w: 288, h: 477 },
-      { x: 410, y: 95, w: 281, h: 477 },
-      { x: 778, y: 95, w: 282, h: 477 },
-      { x: 1115, y: 95, w: 279, h: 477 },
-      { x: 1459, y: 95, w: 289, h: 477, ox: -3 }
-    ]
-  },
-  drink_water: {
-    sheet: 'drink_water', scale: 0.155, fps: 3.2, label: '🥤 กำลังดื่มน้ำเย็นๆ (Drink Water)',
-    frames: [
-      { x: 51, y: 101, w: 293, h: 464, ox: -5 },
-      { x: 423, y: 100, w: 278, h: 465, ox: 4 },
-      { x: 777, y: 98, w: 278, h: 467, ox: 3 },
-      { x: 1121, y: 101, w: 273, h: 464, ox: 3 },
-      { x: 1455, y: 100, w: 280, h: 465 }
-    ]
-  },
-
-  // ท่าแสดงอารมณ์ชุดใหญ่ 10 เฟรม
-  laugh: {
-    sheet: 'laugh', scale: 0.248, fps: 5, label: '😂 หัวเราะขำกลิ้ง! (Laugh 10 Frames)',
-    frames: [
-      { x: 25, y: 120, w: 196, h: 330, ox: -18 },
-      { x: 262, y: 120, w: 239, h: 326, ox: -13 },
-      { x: 504, y: 129, w: 207, h: 321, ox: -24 },
-      { x: 721, y: 123, w: 226, h: 328 },
-      { x: 967, y: 102, w: 224, h: 349, ox: 24 },
-      { x: 37, y: 536, w: 208, h: 330, ox: -37 },
-      { x: 256, y: 491, w: 248, h: 375, ox: -37 },
-      { x: 533, y: 527, w: 170, h: 339, ox: -6 },
-      { x: 720, y: 527, w: 237, h: 339, ox: -5 },
-      { x: 982, y: 527, w: 159, h: 339, ox: -7 }
-    ]
-  },
-  angry: {
-    sheet: 'angry', scale: 0.261, fps: 5, label: '😡 หัวร้อนสุดขีด! (Angry 10 Frames)',
-    frames: [
-      { x: 75, y: 138, w: 161, h: 314 },
-      { x: 309, y: 134, w: 184, h: 318, ox: 12 },
-      { x: 520, y: 134, w: 200, h: 318, ox: 7 },
-      { x: 742, y: 135, w: 185, h: 317, ox: 7 },
-      { x: 941, y: 164, w: 240, h: 288, ox: 14 },
-      { x: 63, y: 535, w: 181, h: 318, ox: -17 },
-      { x: 295, y: 534, w: 177, h: 319, ox: -9 },
-      { x: 517, y: 487, w: 238, h: 366, ox: 33 },
-      { x: 754, y: 490, w: 213, h: 364, ox: 21 },
-      { x: 966, y: 539, w: 164, h: 315, ox: -12 }
-    ]
-  },
-  victory: {
-    sheet: 'victory', scale: 0.256, fps: 5.5, label: '✌️ ปิดจ๊อบสำเร็จ! (Victory 10 Frames)',
-    frames: [
-      { x: 74, y: 139, w: 146, h: 320, ox: 8 },
-      { x: 261, y: 135, w: 230, h: 324, ox: 4 },
-      { x: 505, y: 131, w: 212, h: 328, ox: 3 },
-      { x: 740, y: 107, w: 213, h: 328, ox: -3 },
-      { x: 964, y: 91, w: 209, h: 345, ox: 3 },
-      { x: 54, y: 545, w: 189, h: 309, ox: -6 },
-      { x: 274, y: 492, w: 217, h: 363 },
-      { x: 507, y: 492, w: 212, h: 363, ox: -13 },
-      { x: 737, y: 539, w: 227, h: 316, ox: -5 },
-      { x: 1002, y: 543, w: 143, h: 313 }
-    ]
-  },
-  sleep: {
-    sheet: 'sleep', scale: 0.256, fps: 2.2, label: '💤 งีบหลับเติมพลัง (Sleep 5 Frames)',
-    frames: [
-      { x: 64, y: 139, w: 153, h: 322 },
-      { x: 287, y: 138, w: 151, h: 323 },
-      { x: 491, y: 157, w: 204, h: 304 },
-      { x: 724, y: 152, w: 188, h: 315 },
-      { x: 966, y: 124, w: 191, h: 346 }
-    ]
-  }
-};
-
-// โซนกิจกรรมในออฟฟิศ
-const ZONES = [
-  { name: 'โต๊ะทำงาน Lead', x: 105, y: 150, w: 160, h: 90, action: 'sit', hint: 'กด [E] เพื่อนั่งทำงานที่โต๊ะ Lead' },
-  { name: 'โต๊ะทำงาน Dev',  x: 400, y: 150, w: 160, h: 90, action: 'serious_talk', hint: 'กด [E] เพื่อเข้าโหมดคุยงานจริงจัง' },
-  { name: 'โต๊ะทำงาน Design', x: 695, y: 150, w: 160, h: 90, action: 'victory', hint: 'กด [E] เพื่อฉลองงานเสร็จ (Victory)' },
-  { name: 'ห้องประชุมกลาง', x: 355, y: 345, w: 250, h: 170, action: 'normal_talk', hint: 'กด [E] เพื่อเริ่มคุยประชุมงาน' },
-  { name: 'มุมพักผ่อน (Nap Zone)', x: 45, y: 400, w: 175, h: 120, action: 'sleep', hint: 'กด [E] เพื่อนอนงีบพักสายตา' },
-  { name: 'มุมขนม & กาแฟ (Pantry)', x: 740, y: 400, w: 175, h: 120, action: 'eat_chicken', hint: 'กด [E] เพื่อพักกินไก่ทอด/ผลไม้/ดื่มน้ำ' }
-];
-
-const me = {
-  name: 'คุณ (Lead)',
-  x: 185, y: 265,
-  targetX: 185, targetY: 265,
-  facing: 'down', // 'down' | 'up' | 'left' | 'right'
-  isMoving: false,
-  action: 'idle',
-  actionStartTime: 0,
-  sitVariant: 0,
-  pantryVariant: 0,
-  lastActiveTime: performance.now()
-};
-
-function setAction(newAction) {
-  if (newAction === 'sit' && me.action === 'sit') {
-    me.sitVariant = (me.sitVariant + 1) % 3;
-  }
-  if (me.action !== newAction) {
-    me.actionStartTime = performance.now();
-  }
-  me.action = newAction;
-  me.lastActiveTime = performance.now();
-
-  document.querySelectorAll('.emote-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.action === newAction);
-  });
-
-  const statusEl = document.getElementById('statusText');
-  const dotEl = document.getElementById('statusDot');
-  if (newAction === 'idle') {
-    statusEl.textContent = me.isMoving ? 'กำลังเดิน...' : 'พร้อมลุยงาน (Idle)';
-    dotEl.style.background = '#22c55e';
-    dotEl.style.boxShadow = '0 0 8px #22c55e';
-  } else {
-    const anim = ANIMATIONS[newAction];
-    statusEl.textContent = anim && anim.label ? anim.label : newAction;
-    dotEl.style.background = (newAction === 'angry' || newAction === 'angry_talk')
-      ? '#ef4444'
-      : (newAction === 'sleep' ? '#a855f7' : '#38bdf8');
-    dotEl.style.boxShadow = `0 0 8px ${dotEl.style.background}`;
-  }
-}
-
-document.querySelectorAll('.emote-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    me.targetX = me.x;
-    me.targetY = me.y;
-    me.isMoving = false;
-    setAction(btn.dataset.action);
-  });
-});
-
-const keys = {};
-const SHORTCUT_MAP = {
-  '0': 'idle',
-  '1': 'normal_talk',
-  '2': 'serious_talk',
-  '3': 'angry_talk',
-  '4': 'sit',
-  '5': 'eat_chicken',
-  '6': 'eat_fruit',
-  '7': 'drink_water',
-  '8': 'laugh',
-  '9': 'angry',
-  'v': 'victory',
-  'z': 'sleep'
-};
-
-const CODE_TO_KEY = {
-  KeyW: 'w', KeyA: 'a', KeyS: 's', KeyD: 'd', KeyE: 'e',
-  KeyV: 'v', KeyZ: 'z',
-  ArrowUp: 'arrowup', ArrowDown: 'arrowdown', ArrowLeft: 'arrowleft', ArrowRight: 'arrowright',
-  Digit0: '0', Digit1: '1', Digit2: '2', Digit3: '3', Digit4: '4',
-  Digit5: '5', Digit6: '6', Digit7: '7', Digit8: '8', Digit9: '9',
-  Numpad0: '0', Numpad1: '1', Numpad2: '2', Numpad3: '3', Numpad4: '4',
-  Numpad5: '5', Numpad6: '6', Numpad7: '7', Numpad8: '8', Numpad9: '9'
-};
-
-window.addEventListener('keydown', e => {
-  const k = CODE_TO_KEY[e.code] || e.key.toLowerCase();
-  keys[k] = true;
-  me.lastActiveTime = performance.now();
-
-  if (SHORTCUT_MAP[k]) {
-    me.targetX = me.x;
-    me.targetY = me.y;
-    me.isMoving = false;
-    setAction(SHORTCUT_MAP[k]);
-  } else if (k === 'e') {
-    const z = getCurrentZone();
-    if (z) {
-      me.targetX = me.x;
-      me.targetY = me.y;
-      me.isMoving = false;
-      if (z.action === 'eat_chicken') {
-        const pantryActions = ['eat_chicken', 'eat_fruit', 'drink_water'];
-        const chosen = pantryActions[me.pantryVariant % pantryActions.length];
-        me.pantryVariant++;
-        setAction(chosen);
-      } else {
-        setAction(z.action);
-      }
-    }
-  }
-});
-
-window.addEventListener('keyup', e => {
-  const k = CODE_TO_KEY[e.code] || e.key.toLowerCase();
-  keys[k] = false;
-});
-
-window.addEventListener('blur', () => {
-  Object.keys(keys).forEach(k => { keys[k] = false; });
-});
-
-canvas.addEventListener('click', e => {
-  const rect = canvas.getBoundingClientRect();
-  const cx = e.clientX - rect.left;
-  const cy = e.clientY - rect.top;
-  if (cy > 95 && cy < 575) {
-    me.targetX = cx;
-    me.targetY = cy;
-    me.lastActiveTime = performance.now();
-    if (me.action !== 'idle') setAction('idle');
-  }
-});
-
-function getCurrentZone() {
-  return ZONES.find(z => me.x >= z.x && me.x <= z.x + z.w && me.y >= z.y && me.y <= z.y + z.h);
-}
-
-// 2. วาดฉากออฟฟิศ
-function drawOffice() {
-  ctx.fillStyle = '#b88655';
-  ctx.fillRect(0, 80, canvas.width, canvas.height - 80);
-  ctx.strokeStyle = '#7c532c';
-  ctx.lineWidth = 1.5;
-  for (let row = 0; row < 22; row++) {
-    const y = 80 + row * 26;
-    const offset = (row % 2) * 40;
-    for (let col = -1; col < 14; col++) {
-      ctx.strokeRect(col * 80 + offset, y, 80, 26);
-    }
-  }
-
-  ctx.fillStyle = '#1b2232';
-  ctx.fillRect(0, 0, canvas.width, 80);
-  ctx.fillStyle = '#ea580c';
-  ctx.fillRect(390, 12, 180, 56);
-  ctx.fillStyle = '#fff';
-  ctx.font = 'bold 26px monospace';
-  ctx.textAlign = 'center';
-  ctx.fillText('TEAM 3P', 480, 49);
-
-  const deskNames = ['Lead Desk', 'Dev Desk', 'Design Desk'];
-  [105, 400, 695].forEach((dx, idx) => {
-    ctx.fillStyle = '#d6b485';
-    ctx.fillRect(dx, 150, 160, 56);
-    ctx.strokeStyle = '#45270c';
-    ctx.strokeRect(dx, 150, 160, 56);
-    ctx.fillStyle = '#1e293b';
-    ctx.fillRect(dx + 30, 138, 44, 30);
-    ctx.fillRect(dx + 86, 138, 44, 30);
-    ctx.fillStyle = 'rgba(255,255,255,0.65)';
-    ctx.font = 'bold 11px Tahoma';
-    ctx.fillText(deskNames[idx], dx + 80, 192);
-  });
-
-  ctx.fillStyle = 'rgba(49, 46, 129, 0.78)';
-  ctx.fillRect(45, 400, 175, 120);
-  ctx.strokeStyle = '#818cf8';
-  ctx.strokeRect(45, 400, 175, 120);
-  ctx.fillStyle = '#c7d2fe';
-  ctx.font = 'bold 12px Tahoma';
-  ctx.fillText('💤 Nap Zone (โซนงีบ)', 132, 425);
-  ctx.fillStyle = '#4338ca';
-  ctx.fillRect(70, 445, 125, 52);
-
-  ctx.fillStyle = 'rgba(30, 41, 59, 0.85)';
-  ctx.fillRect(355, 345, 250, 170);
-  ctx.strokeStyle = '#64748b';
-  ctx.strokeRect(355, 345, 250, 170);
-  ctx.fillStyle = '#e2e8f0';
-  ctx.fillRect(410, 397, 140, 56);
-  ctx.fillStyle = '#475569';
-  ctx.font = 'bold 12px Tahoma';
-  ctx.fillText('💬 Meeting Table', 480, 429);
-
-  ctx.fillStyle = 'rgba(124, 45, 18, 0.78)';
-  ctx.fillRect(740, 400, 175, 120);
-  ctx.strokeStyle = '#fb923c';
-  ctx.strokeRect(740, 400, 175, 120);
-  ctx.fillStyle = '#fed7aa';
-  ctx.font = 'bold 12px Tahoma';
-  ctx.fillText('🍗 Pantry (โซนของกิน)', 827, 425);
-  ctx.fillStyle = '#fde68a';
-  ctx.fillRect(770, 445, 115, 50);
-
-  const activeZone = getCurrentZone();
-  if (activeZone) {
-    ctx.save();
-    ctx.strokeStyle = '#38bdf8';
-    ctx.lineWidth = 2.5;
-    ctx.setLineDash([6, 4]);
-    ctx.strokeRect(activeZone.x - 4, activeZone.y - 4, activeZone.w + 8, activeZone.h + 8);
-    ctx.restore();
-  }
-}
-
-// 3. วาดตัวละครของคุณจาก Sprite Sheet ทั้ง 14 แผ่น
-function drawPlayer(time) {
-  let animKey = 'idle_down';
-  if (me.isMoving) {
-    animKey = 'walk_' + me.facing;
-  } else if (me.action !== 'idle') {
-    animKey = me.action;
-  } else {
-    animKey = 'idle_' + me.facing;
-  }
-
-  let anim = ANIMATIONS[animKey] || ANIMATIONS.idle_down;
-  let sheet = SHEETS[anim.sheet];
-
-  // Fallback กรณีแผ่นภาพนั้นยังโหลดไม่เสร็จ
-  if (!(sheet && sheet.complete && sheet.naturalWidth > 0)) {
-    anim = ANIMATIONS['idle_' + me.facing] || ANIMATIONS.idle_down;
-    sheet = SHEETS[anim.sheet];
-  }
-
-  const scale = anim.scale || 0.25;
-  const elapsed = Math.max(0, time - me.actionStartTime);
-
-  let frameIdx = 0;
-  if (animKey === 'sit') {
-    frameIdx = me.sitVariant % anim.frames.length;
-  } else if (animKey === 'sleep') {
-    // ไล่จากหาว (0 -> 1 -> 2) แล้ววนลูปตอนนอนหลับปุ๋ย (3 <-> 4) อย่างสมูท
-    const step = Math.floor((elapsed / 1000) * anim.fps);
-    frameIdx = step < 3 ? step : (3 + ((step - 3) % 2));
-  } else if (anim.fps > 0 && anim.frames.length > 1) {
-    const baseTime = me.isMoving ? time : elapsed;
-    frameIdx = Math.floor((baseTime / 1000) * anim.fps) % anim.frames.length;
-  }
-  const frame = anim.frames[frameIdx] || anim.frames[0];
-
-  ctx.save();
-  ctx.translate(me.x, me.y);
-
-  // เงาใต้เท้า (ยกเว้นท่านอน sleep ที่มีเงาตามสรีระท่านอนในแผ่นภาพอยู่แล้ว)
-  if (animKey !== 'sleep') {
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.36)';
-    ctx.beginPath();
-    ctx.ellipse(0, 5, 22, 8, 0, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  if (sheet && sheet.complete && sheet.naturalWidth > 0) {
-    const drawW = frame.w * scale;
-    const drawH = frame.h * scale;
-    const ox = (frame.ox || 0) * scale;
-
-    ctx.save();
-    if (anim.flipX) {
-      ctx.scale(-1, 1);
-    }
-    ctx.drawImage(
-      sheet,
-      frame.x, frame.y, frame.w, frame.h,
-      -drawW / 2 + ox, -drawH + 10, drawW, drawH
-    );
-    ctx.restore();
-  }
-  ctx.restore();
-
-  // ป้ายชื่อเหนือหัว
-  ctx.save();
-  ctx.font = 'bold 13px Tahoma';
-  ctx.textAlign = 'center';
-  ctx.strokeStyle = '#000';
-  ctx.lineWidth = 3.5;
-  const labelY = me.y - 84;
-  ctx.strokeText(me.name, me.x, labelY);
-  ctx.fillStyle = '#fef08a';
-  ctx.fillText(me.name, me.x, labelY);
-  ctx.restore();
-}
-
-// 4. ระบบคำนวณการเดิน 4 ทิศทาง & โซนอัตโนมัติ
-const FACING_LABELS = {
-  down: 'หน้า (Front)',
-  up: 'หลัง (Back)',
-  left: 'ซ้าย (Left)',
-  right: 'ขวา (Right)'
-};
-
-function update(time) {
-  const speed = 3.3;
-  let dxKey = 0, dyKey = 0;
-
-  if (keys['w'] || keys['arrowup'])    dyKey -= 1;
-  if (keys['s'] || keys['arrowdown'])  dyKey += 1;
-  if (keys['a'] || keys['arrowleft'])  dxKey -= 1;
-  if (keys['d'] || keys['arrowright']) dxKey += 1;
-
-  if (dxKey !== 0 || dyKey !== 0) {
-    const len = Math.hypot(dxKey, dyKey);
-    me.x += (dxKey / len) * speed;
-    me.y += (dyKey / len) * speed;
-    me.targetX = me.x;
-    me.targetY = me.y;
-    me.isMoving = true;
-
-    if (Math.abs(dxKey) >= Math.abs(dyKey)) {
-      me.facing = dxKey > 0 ? 'right' : 'left';
-    } else {
-      me.facing = dyKey > 0 ? 'down' : 'up';
-    }
-
-    if (me.action !== 'idle') setAction('idle');
-    document.getElementById('statusText').textContent = 'กำลังเดิน...';
-  } else {
-    const dx = me.targetX - me.x;
-    const dy = me.targetY - me.y;
-    const dist = Math.hypot(dx, dy);
-
-    if (dist > 3) {
-      me.x += (dx / dist) * speed;
-      me.y += (dy / dist) * speed;
-      if (Math.abs(dx) >= Math.abs(dy)) {
-        me.facing = dx > 0 ? 'right' : 'left';
-      } else {
-        me.facing = dy > 0 ? 'down' : 'up';
-      }
-      me.isMoving = true;
-    } else {
-      if (me.isMoving && me.action === 'idle') {
-        document.getElementById('statusText').textContent = 'พร้อมลุยงาน (Idle)';
-      }
-      me.isMoving = false;
-    }
-  }
-
-  // ระบบ Auto-AFK: ถ้ายืนนิ่งเกิน 25 วินาที ให้ตัวละครงีบหลับอัตโนมัติ
-  if (!me.isMoving && me.action === 'idle' && time - me.lastActiveTime > 25000) {
-    setAction('sleep');
-  }
-
-  me.x = Math.max(40, Math.min(canvas.width - 40, me.x));
-  me.y = Math.max(120, Math.min(565, me.y));
-
-  document.getElementById('facingText').textContent = FACING_LABELS[me.facing] || me.facing;
-
-  const currentZone = getCurrentZone();
-  const hintEl = document.getElementById('zoneHint');
-  if (currentZone) {
-    hintEl.innerHTML = `📍 คุณอยู่ในโซน <b>${currentZone.name}</b> — <b>${currentZone.hint}</b> หรือกดปุ่มท่าทางด้านล่าง`;
-  } else {
-    hintEl.innerHTML = `🎮 กด <b>W A S D</b> / <b>ลูกศร</b> หรือ <b>คลิกพื้นไม้</b> เพื่อเดิน 4 ทิศทาง | กด <b>E</b> โต้ตอบกับจุดใกล้ตัว | กดปุ่มหรือ <b>เลข 0-9, V, Z</b> เพื่อเปลี่ยนท่าทาง`;
-  }
-}
-
-function loop(time) {
-  update(time);
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drawOffice();
-  drawPlayer(time);
-  requestAnimationFrame(loop);
-}
-
-requestAnimationFrame(loop);
-</script>
+<script type="module" src="./src/main.js"></script>
 </body>
 </html>

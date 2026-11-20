@@ -1,4 +1,5 @@
 import { EMOTE_BUTTONS, DEFAULT_GUIDE_HTML } from './config/officeZones.js';
+import { HAIR_4WAY_STYLES } from './config/avatarItemsConfig.js';
 import { VirtualOfficeEngine } from './engine/VirtualOfficeEngine.js';
 import { drawModularAvatar, drawBaseBodyCard } from './engine/modularAvatarRenderer.js';
 import {
@@ -138,7 +139,11 @@ function renderGenderLeftPanel() {
 }
 
 function getCategoryBadge(catId) {
-  if (catId === 'hair') return 'หัวโล้น (Base)';
+  if (catId === 'hair') {
+    return draftAvatar.hairStyle === 'none'
+      ? 'หัวโล้น (Base)'
+      : (HAIR_4WAY_STYLES[draftAvatar.hairStyle]?.name || 'เลือกแล้ว');
+  }
   if (catId === 'top') return 'เสื้อเดิม (Base)';
   if (catId === 'bottom') return 'กางเกงเดิม (Base)';
   if (catId === 'face') return 'หน้าเดิม (Base)';
@@ -157,11 +162,20 @@ function renderAccordion() {
     let itemsHtml = '';
     if (isOpen) {
       if (cat.id === 'hair') {
+        const hairList = Object.values(HAIR_4WAY_STYLES).filter(
+          h => !h.gender || h.gender === draftAvatar.gender
+        );
         itemsHtml = `
-          <div class="accordion-item-card active" data-type="hair" data-id="none">
+          <div class="accordion-item-card${draftAvatar.hairStyle === 'none' ? ' active' : ''}" data-type="hair" data-id="none">
             <div style="font-size: 26px; height: 50px; display: flex; align-items: center; justify-content: center;">🧑‍🦲</div>
             <div class="accordion-item-label">หัวโล้น (Base)</div>
           </div>
+          ${hairList.map(h => `
+            <div class="accordion-item-card${draftAvatar.hairStyle === h.id ? ' active' : ''}" data-type="hair" data-id="${h.id}">
+              <img src="${engine.sheets[h.sheets.down]?.src || ''}" style="height: 50px; width: 50px; object-fit: contain;" alt="${h.name}" />
+              <div class="accordion-item-label">${h.name}</div>
+            </div>
+          `).join('')}
         `;
       } else if (cat.id === 'top') {
         itemsHtml = `
@@ -242,8 +256,8 @@ if (costumeAccordionEl) {
       const idVal = itemCard.dataset.id;
 
       if (type === 'hair') {
-        draftAvatar.hairStyle = 'none';
-        draftAvatar.hairIndex = -1;
+        draftAvatar.hairStyle = idVal;
+        draftAvatar.hairIndex = idVal === 'none' ? -1 : 0;
       } else if (type === 'top') {
         draftAvatar.topIndex = parseInt(idVal, 10);
       } else if (type === 'bottom') {

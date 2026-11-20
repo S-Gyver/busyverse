@@ -1,7 +1,7 @@
-import { BODY_FILE_MAP } from '../config/avatarItemsConfig.js';
+import { BODY_FILE_MAP, HAIR_4WAY_STYLES } from '../config/avatarItemsConfig.js';
 
 /**
- * วาดหุ่นตัวละครพื้นฐาน 4 ทิศทาง (Local 100%)
+ * วาดหุ่นตัวละครพื้นฐาน 4 ทิศทาง + ทรงผม 4 ทิศทาง (Local 100%)
  */
 export function drawModularAvatar(ctx, avatar, sheets, time, state = {}) {
   const isMoving = Boolean(state.isMoving);
@@ -32,26 +32,41 @@ export function drawModularAvatar(ctx, avatar, sheets, time, state = {}) {
   ctx.translate(0, bobY);
   ctx.rotate(tiltAngle);
 
-  // ล็อกความสูงมาตรฐาน 340px แล้วคำนวณความกว้างตามสัดส่วนจริงของไฟล์นั้นๆ
   const targetH = 340;
   const targetW = (img.naturalWidth / img.naturalHeight) * targetH;
   const footY = 12;
 
-  // วาดหุ่น Base Body
-  ctx.drawImage(
-    img,
-    -targetW / 2,
-    footY - targetH,
-    targetW,
-    targetH
-  );
+  // 1. วาดหุ่น Base Body
+  ctx.drawImage(img, -targetW / 2, footY - targetH, targetW, targetH);
+
+  // 2. วาดทรงผม 4 ทิศทาง (ถ้าเลือกทรงผมไว้)
+  const hairStyleKey = avatar.hairStyle;
+  if (hairStyleKey && hairStyleKey !== 'none') {
+    const hairStyle = HAIR_4WAY_STYLES[hairStyleKey];
+    if (hairStyle) {
+      const hairSheetKey = hairStyle.sheets[facing] || hairStyle.sheets.down;
+      const hairImg = sheets[hairSheetKey];
+      if (hairImg && hairImg.complete && hairImg.naturalWidth > 0) {
+        const cfg = (hairStyle.offsets && hairStyle.offsets[facing]) || { w: 184, ox: 0, oy: -24 };
+        const hw = cfg.w;
+        const hh = (hairImg.naturalHeight / hairImg.naturalWidth) * hw;
+        ctx.drawImage(
+          hairImg,
+          -hw / 2 + cfg.ox,
+          footY - targetH + cfg.oy,
+          hw,
+          hh
+        );
+      }
+    }
+  }
 
   ctx.restore();
   return true;
 }
 
 /**
- * วาดรูปพรีวิวหุ่นลงในการ์ดเลือกเพศ / การ์ดหันทิศทาง (หันหน้า, หันซ้าย, หันขวา, หันหลัง)
+ * วาดรูปพรีวิวหุ่น (พร้อมทรงผมถ้ามี) ลงในการ์ดเลือกเพศ / การ์ด 4 ทิศทาง
  */
 export function drawBaseBodyCard(canvas, gender, facingDir, sheets, avatar = null) {
   if (!canvas) return;
@@ -65,15 +80,18 @@ export function drawBaseBodyCard(canvas, gender, facingDir, sheets, avatar = nul
   const img = sheets[sheetKey];
   if (!(img && img.complete && img.naturalWidth > 0)) return;
 
-  const pad = 6;
-  const scale = Math.min(
-    (w - pad * 2) / img.naturalWidth,
-    (h - pad * 2) / img.naturalHeight
+  ctx.save();
+  ctx.translate(w / 2, h - 8);
+  drawModularAvatar(
+    ctx,
+    {
+      gender,
+      facing: facingDir,
+      hairStyle: avatar ? avatar.hairStyle : 'none'
+    },
+    sheets,
+    0,
+    { facing: facingDir, scale: Math.min(w, h) / 390, isMoving: false }
   );
-  const dw = img.naturalWidth * scale;
-  const dh = img.naturalHeight * scale;
-  const dx = (w - dw) / 2;
-  const dy = (h - dh) / 2;
-
-  ctx.drawImage(img, dx, dy, dw, dh);
+  ctx.restore();
 }

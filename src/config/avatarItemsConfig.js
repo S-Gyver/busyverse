@@ -7,10 +7,53 @@ export const MODULAR_SHEET_FILES = {
   female_front: './assets/characters/female/body/front.png',
   female_left:  './assets/characters/female/body/left.png',
   female_right: './assets/characters/female/body/right.png',
-  female_back:  './assets/characters/female/body/back.png'
+  female_back:  './assets/characters/female/body/back.png',
+  hair_brown_parted_front: './assets/characters/male/hair/brown_parted/front.png',
+  hair_brown_parted_left:  './assets/characters/male/hair/brown_parted/left.png',
+  hair_brown_parted_right: './assets/characters/male/hair/brown_parted/right.png',
+  hair_brown_parted_back:  './assets/characters/male/hair/brown_parted/back.png',
+  hair_brown_twoblock_front: './assets/characters/male/hair/brown_twoblock/front.png',
+  hair_brown_twoblock_left:  './assets/characters/male/hair/brown_twoblock/left.png',
+  hair_brown_twoblock_right: './assets/characters/male/hair/brown_twoblock/right.png',
+  hair_brown_twoblock_back:  './assets/characters/male/hair/brown_twoblock/back.png'
 };
 
-export const HAIR_4WAY_STYLES = {};
+export const HAIR_4WAY_STYLES = {
+  brown_parted: {
+    id: 'brown_parted',
+    name: 'ผมแสกข้างน้ำตาล',
+    gender: 'male',
+    sheets: {
+      down:  'hair_brown_parted_front',
+      left:  'hair_brown_parted_left',
+      right: 'hair_brown_parted_right',
+      up:    'hair_brown_parted_back'
+    },
+    offsets: {
+      down:  { w: 172, ox: 2,  oy: -10 },
+      left:  { w: 166, ox: 2,  oy: -14 },
+      right: { w: 166, ox: -2, oy: -14 },
+      up:    { w: 170, ox: 0,  oy: -7 }
+    }
+  },
+  brown_twoblock: {
+    id: 'brown_twoblock',
+    name: 'ผมแสกกลางน้ำตาล (ทรงใหม่)',
+    gender: 'male',
+    sheets: {
+      down:  'hair_brown_twoblock_front',
+      left:  'hair_brown_twoblock_left',
+      right: 'hair_brown_twoblock_right',
+      up:    'hair_brown_twoblock_back'
+    },
+    offsets: {
+      down:  { w: 169, ox: -4,  oy: -16 },
+      left:  { w: 172, ox: 2,   oy: -37 },
+      right: { w: 172, ox: -8,  oy: -35 },
+      up:    { w: 170, ox: 0,   oy: 3 }
+    }
+  }
+};
 
 // ตัวเลือกตัวละครหลัก (6 ช่องฝั่งซ้าย "เลือกตัวละคร")
 export const CHARACTER_PRESETS = [

@@ -1,10 +1,14 @@
 import {
   BODY_FILE_MAP,
   WALK_BODY_MAP,
+  SIT_BODY_MAP,
   RO_HEAD_OFFSETS,
   RO_HAIR_OFFSETS,
   RO_HEAD_BASE_H,
-  RO_WALK_HEAD_OFFSETS
+  RO_WALK_HEAD_OFFSETS,
+  RO_SIT_HEAD_OFFSETS,
+  RO_SLEEP_HEAD_OFFSET,
+  RO_SLEEP_HAIR_OFFSETS
 } from '../config/avatarItemsConfig.js';
 
 /**
@@ -18,10 +22,30 @@ export function getHairOffset(hairId, facing) {
 }
 
 /**
- * ดึงหรือโหลด Sprite ของทรงผม RO 1_male ถึง 30_male ใน 8 ทิศทาง
+ * ดึงหรือโหลด Sprite ของทรงผม RO 1_male ถึง 30_male ใน 8 ทิศทาง หรือท่านอน
  */
-export function getHairSheet(sheets, hairId = 1, facing = 'down') {
+export function getHairSheet(sheets, hairId = 1, facing = 'down', isSleeping = false) {
   const safeId = hairId || 1;
+  if (isSleeping) {
+    const sleepKey = `ro_hair_${safeId}_sleep`;
+    if (sheets[sleepKey] && sheets[sleepKey].complete && sheets[sleepKey].naturalWidth > 0) {
+      return sheets[sleepKey];
+    }
+    if (!sheets[sleepKey]) {
+      const img = new Image();
+      img.src = `./assets/body/male/hair/${safeId}_male/hair_sleep.png`;
+      sheets[sleepKey] = img;
+    }
+    if (sheets[sleepKey].complete && sheets[sleepKey].naturalWidth > 0) {
+      return sheets[sleepKey];
+    }
+    if (sheets['ro_hair_sleep'] && sheets['ro_hair_sleep'].complete && sheets['ro_hair_sleep'].naturalWidth > 0) {
+      return sheets['ro_hair_sleep'];
+    }
+    // หากทรงผมนี้ยังไม่มีสไปรต์ท่านอน ให้ใช้หน้าตรง down แทน
+    return getHairSheet(sheets, hairId, 'down', false);
+  }
+
   const key = `ro_hair_${safeId}_${facing}`;
   if (sheets[key] && sheets[key].complete && sheets[key].naturalWidth > 0) {
     return sheets[key];
@@ -43,6 +67,7 @@ export function getHairSheet(sheets, hairId = 1, facing = 'down') {
 export function drawModularAvatar(ctx, avatar, sheets, time, state = {}) {
   const isMoving = Boolean(state.isMoving);
   const isRunning = Boolean(state.isRunning);
+  const action = state.action || avatar.action || 'idle';
   const facing = state.facing || avatar.facing || 'down';
   const renderScale = state.scale || 0.255;
 
@@ -50,10 +75,26 @@ export function drawModularAvatar(ctx, avatar, sheets, time, state = {}) {
   ctx.imageSmoothingEnabled = false;
   ctx.scale(renderScale, renderScale);
 
-  const bodyKey = (BODY_FILE_MAP.ro_novice && BODY_FILE_MAP.ro_novice[facing]) || 'ro_body_down';
+  let bodyKey = (BODY_FILE_MAP.ro_novice && BODY_FILE_MAP.ro_novice[facing]) || 'ro_body_down';
+  const isSitting = !isMoving && action === 'sit';
+  const isSleeping = !isMoving && action === 'sleep';
+
+  if (isSitting) {
+    const sitKey = SIT_BODY_MAP?.ro_novice?.[facing];
+    if (sheets[sitKey] && sheets[sitKey].complete && sheets[sitKey].naturalWidth > 0) {
+      bodyKey = sitKey;
+    }
+  } else if (isSleeping) {
+    if (sheets['ro_sleep'] && sheets['ro_sleep'].complete && sheets['ro_sleep'].naturalWidth > 0) {
+      bodyKey = 'ro_sleep';
+    }
+  }
+
   let bImg = sheets[bodyKey];
   const hairId = avatar.hair || 1;
-  const hImg = getHairSheet(sheets, hairId, facing);
+  // เมื่อนอนลงกับพื้น จะหันหน้าตรงตามสไปรต์ตัวท่านอนเสมอ
+  const hairFacing = isSleeping ? 'down' : facing;
+  const hImg = getHairSheet(sheets, hairId, hairFacing, isSleeping);
 
   // ตรวจสอบและดึงภาพแอนิเมชันเดิน (Walk Frames) หากตัวละครกำลังเคลื่อนไหว
   const walkFrames = WALK_BODY_MAP?.ro_novice?.[facing];
@@ -75,7 +116,7 @@ export function drawModularAvatar(ctx, avatar, sheets, time, state = {}) {
   }
 
   let bobY = 0;
-  // ใช้ sine bobbing เฉพาะทิศทางที่ยังไม่มีภาพสไปรต์เดินแบบแยกเฟรม
+  // ใช้ sine bobbing เฉพาะทิศทางที่ยังไม่มีภาพสไปรต์เดินแบบแยกเฟรม (ไม่ใช้ตอนนั่ง/นอน)
   if (isMoving && !hasWalkAnim) {
     const freq = isRunning ? 0.022 : 0.014;
     const amp = isRunning ? 10 : 6;
@@ -100,13 +141,22 @@ export function drawModularAvatar(ctx, avatar, sheets, time, state = {}) {
   // 2. วาดทรงผมซ้อนทับลงบนหัว
   // ใช้ baseHeadH เพื่อล็อกตำแหน่งกะโหลกศีรษะ/ตา ทรงผมยาว (หางม้า) จะห้อยลงมาพาดหลังธรรมชาติ ไม่ดันหัวลอย
   if (hImg && hImg.complete && hImg.naturalWidth > 0) {
-    const offset = getHairOffset(hairId, facing);
+    const offset = getHairOffset(hairId, hairFacing);
     const walkOffset = (hasWalkAnim && RO_WALK_HEAD_OFFSETS?.[facing]?.[frameIdx]) || { x: 0, y: 0 };
-    const baseHeadH = ((RO_HEAD_BASE_H && RO_HEAD_BASE_H[facing]) || 26) * pixelScale;
+    const sitOffset = (isSitting && RO_SIT_HEAD_OFFSETS?.[facing]) || { x: 0, y: 0 };
+    const isSleepHair = isSleeping && hImg && (
+      (hImg.src && hImg.src.includes('hair_sleep')) ||
+      sheets[`ro_hair_${hairId}_sleep`] === hImg ||
+      sheets['ro_hair_sleep'] === hImg
+    );
+    const sleepOffset = isSleeping
+      ? ((isSleepHair && (RO_SLEEP_HAIR_OFFSETS?.[hairId] || { x: 18, y: 22 })) || RO_SLEEP_HEAD_OFFSET || { x: 18, y: 22 })
+      : { x: 0, y: 0 };
+    const baseHeadH = ((RO_HEAD_BASE_H && RO_HEAD_BASE_H[hairFacing]) || 26) * pixelScale;
     const hairW = hImg.naturalWidth * pixelScale;
     const hairH = hImg.naturalHeight * pixelScale;
-    const hairX = -hairW / 2 + ((offset.x + walkOffset.x) * pixelScale);
-    const hairY = bodyY - baseHeadH + ((overlap + offset.y + walkOffset.y) * pixelScale);
+    const hairX = -hairW / 2 + ((offset.x + walkOffset.x + sitOffset.x + sleepOffset.x) * pixelScale);
+    const hairY = bodyY - baseHeadH + ((overlap + offset.y + walkOffset.y + sitOffset.y + sleepOffset.y) * pixelScale);
     ctx.drawImage(hImg, hairX, hairY, hairW, hairH);
   }
 

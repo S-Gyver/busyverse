@@ -89,10 +89,19 @@ export function drawPlayer(ctx, charObj, sheets, time, isMainPlayer = true) {
   ctx.save();
   ctx.translate(charObj.x, charObj.y);
 
-  // เงาใต้เท้า (รองรับพอดี 2 ฝ่าเท้า ไม่ให้เท้าข้างใดข้างหนึ่งลอย)
+  const isSitting = !charObj.isMoving && charObj.action === 'sit';
+  const isSleeping = !charObj.isMoving && charObj.action === 'sleep';
+
+  // เงาใต้เท้า (รองรับพอดี 2 ฝ่าเท้า / ขยายรองรับท่านั่งและท่านอนบนพื้น)
   ctx.fillStyle = 'rgba(0, 0, 0, 0.22)';
   ctx.beginPath();
-  ctx.ellipse(-5, -10, 20, 10, 0, 0, Math.PI * 2);
+  if (isSleeping) {
+    ctx.ellipse(0, -6, 30, 12, 0, 0, Math.PI * 2);
+  } else if (isSitting) {
+    ctx.ellipse(0, -6, 26, 11, 0, 0, Math.PI * 2);
+  } else {
+    ctx.ellipse(-5, -10, 20, 10, 0, 0, Math.PI * 2);
+  }
   ctx.fill();
 
   const avatar = charObj.avatar || {
@@ -113,13 +122,13 @@ export function drawPlayer(ctx, charObj, sheets, time, isMainPlayer = true) {
 
   ctx.restore();
 
-  // ป้ายชื่อเหนือหัว
+  // ป้ายชื่อเหนือหัว (ลดระดับลงตามความสูงตัวละครตอนนั่ง/นอน)
   ctx.save();
   ctx.font = 'bold 12.5px Tahoma';
   ctx.textAlign = 'center';
   ctx.strokeStyle = '#000';
   ctx.lineWidth = 3.5;
-  const labelY = charObj.y - 88;
+  const labelY = isSleeping ? charObj.y - 62 : isSitting ? charObj.y - 70 : charObj.y - 88;
   ctx.strokeText(charObj.name, charObj.x, labelY);
   ctx.fillStyle = isMainPlayer ? '#fef08a' : '#7dd3fc';
   ctx.fillText(charObj.name, charObj.x, labelY);

@@ -1,23 +1,23 @@
 // RO Novice Male 8 directions (Body & Hair)
 export const MODULAR_SHEET_FILES = {
   // RO Novice Male 8 directions (Body)
-  ro_body_down:        './assets/body/male/idle/idle_down.png',
-  ro_body_front_left:  './assets/body/male/idle/idle_front_left.png',
-  ro_body_left:        './assets/body/male/idle/idle_left.png',
-  ro_body_back_left:   './assets/body/male/idle/idle_back_left.png',
-  ro_body_up:          './assets/body/male/idle/idle_up.png',
-  ro_body_back_right:  './assets/body/male/idle/idle_back_right.png',
-  ro_body_right:       './assets/body/male/idle/idle_right.png',
+  ro_body_down: './assets/body/male/idle/idle_down.png',
+  ro_body_front_left: './assets/body/male/idle/idle_front_left.png',
+  ro_body_left: './assets/body/male/idle/idle_left.png',
+  ro_body_back_left: './assets/body/male/idle/idle_back_left.png',
+  ro_body_up: './assets/body/male/idle/idle_up.png',
+  ro_body_back_right: './assets/body/male/idle/idle_back_right.png',
+  ro_body_right: './assets/body/male/idle/idle_right.png',
   ro_body_front_right: './assets/body/male/idle/idle_front_right.png',
 
   // RO Novice Male 8 directions (Hair ทรงเริ่มต้น ทรงที่ 1)
-  ro_hair_down:        './assets/body/male/hair/hair_down.png',
-  ro_hair_front_left:  './assets/body/male/hair/hair_front_left.png',
-  ro_hair_left:        './assets/body/male/hair/hair_left.png',
-  ro_hair_back_left:   './assets/body/male/hair/hair_back_left.png',
-  ro_hair_up:          './assets/body/male/hair/hair_up.png',
-  ro_hair_back_right:  './assets/body/male/hair/hair_back_right.png',
-  ro_hair_right:       './assets/body/male/hair/hair_right.png',
+  ro_hair_down: './assets/body/male/hair/hair_down.png',
+  ro_hair_front_left: './assets/body/male/hair/hair_front_left.png',
+  ro_hair_left: './assets/body/male/hair/hair_left.png',
+  ro_hair_back_left: './assets/body/male/hair/hair_back_left.png',
+  ro_hair_up: './assets/body/male/hair/hair_up.png',
+  ro_hair_back_right: './assets/body/male/hair/hair_back_right.png',
+  ro_hair_right: './assets/body/male/hair/hair_right.png',
   ro_hair_front_right: './assets/body/male/hair/hair_front_right.png',
 
   // RO Novice Walk Down (8 frames)
@@ -98,7 +98,109 @@ export const MODULAR_SHEET_FILES = {
   ro_walk_up_4: './assets/body/male/walk/up/walk_up_4.png',
   ro_walk_up_5: './assets/body/male/walk/up/walk_up_5.png',
   ro_walk_up_6: './assets/body/male/walk/up/walk_up_6.png',
-  ro_walk_up_7: './assets/body/male/walk/up/walk_up_7.png'
+  ro_walk_up_7: './assets/body/male/walk/up/walk_up_7.png',
+
+  // RO Novice Sit (8 directions)
+  ro_sit_down: './assets/body/male/sit/sit_down.png',
+  ro_sit_front_left: './assets/body/male/sit/sit_front_left.png',
+  ro_sit_front_right: './assets/body/male/sit/sit_front_right.png',
+  ro_sit_left: './assets/body/male/sit/sit_left.png',
+  ro_sit_right: './assets/body/male/sit/sit_right.png',
+  ro_sit_back_left: './assets/body/male/sit/sit_back_left.png',
+  ro_sit_back_right: './assets/body/male/sit/sit_back_right.png',
+  ro_sit_up: './assets/body/male/sit/sit_up.png',
+
+  // RO Novice Sleep (Single pose ลงไปนอนที่พื้นภาพเดียว)
+  ro_sleep: './assets/body/male/sleep/sleep.png',
+  ro_hair_1_sleep: './assets/body/male/hair/1_male/hair_sleep.png',
+  ro_hair_2_sleep: './assets/body/male/hair/2_male/hair_sleep.png',
+  ro_hair_3_sleep: './assets/body/male/hair/3_male/hair_sleep.png',
+  ro_hair_4_sleep: './assets/body/male/hair/4_male/hair_sleep.png',
+  ro_hair_5_sleep: './assets/body/male/hair/5_male/hair_sleep.png',
+  ro_hair_6_sleep: './assets/body/male/hair/6_male/hair_sleep.png',
+  ro_hair_7_sleep: './assets/body/male/hair/7_male/hair_sleep.png',
+  ro_hair_8_sleep: './assets/body/male/hair/8_male/hair_sleep.png',
+  ro_hair_9_sleep: './assets/body/male/hair/9_male/hair_sleep.png',
+  ro_hair_10_sleep: './assets/body/male/hair/10_male/hair_sleep.png',
+  ro_hair_11_sleep: './assets/body/male/hair/11_male/hair_sleep.png',
+  ro_hair_12_sleep: './assets/body/male/hair/12_male/hair_sleep.png',
+  ro_hair_13_sleep: './assets/body/male/hair/13_male/hair_sleep.png',
+  ro_hair_14_sleep: './assets/body/male/hair/14_male/hair_sleep.png',
+  ro_hair_15_sleep: './assets/body/male/hair/15_male/hair_sleep.png',
+  ro_hair_16_sleep: './assets/body/male/hair/16_male/hair_sleep.png',
+  ro_hair_17_sleep: './assets/body/male/hair/17_male/hair_sleep.png',
+  ro_hair_18_sleep: './assets/body/male/hair/18_male/hair_sleep.png',
+  ro_hair_19_sleep: './assets/body/male/hair/19_male/hair_sleep.png',
+  ro_hair_20_sleep: './assets/body/male/hair/20_male/hair_sleep.png',
+  ro_hair_21_sleep: './assets/body/male/hair/21_male/hair_sleep.png',
+  ro_hair_22_sleep: './assets/body/male/hair/22_male/hair_sleep.png',
+  ro_hair_23_sleep: './assets/body/male/hair/23_male/hair_sleep.png',
+  ro_hair_24_sleep: './assets/body/male/hair/24_male/hair_sleep.png',
+  ro_hair_25_sleep: './assets/body/male/hair/25_male/hair_sleep.png',
+  ro_hair_26_sleep: './assets/body/male/hair/26_male/hair_sleep.png',
+  ro_hair_27_sleep: './assets/body/male/hair/27_male/hair_sleep.png',
+  ro_hair_28_sleep: './assets/body/male/hair/28_male/hair_sleep.png',
+  ro_hair_29_sleep: './assets/body/male/hair/29_male/hair_sleep.png',
+  ro_hair_30_sleep: './assets/body/male/hair/30_male/hair_sleep.png',
+  ro_hair_sleep: './assets/body/male/hair/hair_sleep.png'
+};
+
+export const SIT_BODY_MAP = {
+  ro_novice: {
+    down: 'ro_sit_down',
+    front_left: 'ro_sit_front_left',
+    front_right: 'ro_sit_front_right',
+    left: 'ro_sit_left',
+    right: 'ro_sit_right',
+    back_left: 'ro_sit_back_left',
+    back_right: 'ro_sit_back_right',
+    up: 'ro_sit_up'
+  }
+};
+
+export const RO_SIT_HEAD_OFFSETS = {
+  down: { x: -1, y: 0 },
+  front_left: { x: 10, y: 0 },
+  front_right: { x: -10, y: 0 },
+  left: { x: 10, y: 0 },
+  right: { x: -10, y: 0 },
+  back_left: { x: 10, y: 0 },
+  back_right: { x: -10, y: 0 },
+  up: { x: 0, y: 0 }
+};
+
+export const RO_SLEEP_HEAD_OFFSET = { x: 18, y: 22 };
+export const RO_SLEEP_HAIR_OFFSETS = {
+  1:  { x: 18, y: 22 },
+  2:  { x: 18, y: 22 },
+  3:  { x: 18, y: 22 },
+  4:  { x: 18, y: 22 },
+  5:  { x: 18, y: 22 },
+  6:  { x: 18, y: 22 },
+  7:  { x: 18, y: 22 },
+  8:  { x: 18, y: 22 },
+  9:  { x: 18, y: 22 },
+  10: { x: 18, y: 22 },
+  11: { x: 18, y: 22 },
+  12: { x: 18, y: 22 },
+  13: { x: 18, y: 22 },
+  14: { x: 18, y: 22 },
+  15: { x: 18, y: 22 },
+  16: { x: 18, y: 22 },
+  17: { x: 18, y: 22 },
+  18: { x: 18, y: 22 },
+  19: { x: 18, y: 22 },
+  20: { x: 18, y: 22 },
+  21: { x: 18, y: 22 },
+  22: { x: 18, y: 22 },
+  23: { x: 18, y: 22 },
+  24: { x: 18, y: 22 },
+  25: { x: 18, y: 22 },
+  26: { x: 18, y: 22 },
+  27: { x: 18, y: 22 },
+  28: { x: 18, y: 22 },
+  29: { x: 18, y: 22 },
+  30: { x: 18, y: 22 }
 };
 
 export const WALK_BODY_MAP = {
@@ -272,51 +374,51 @@ export const RO_WALK_HEAD_OFFSETS = {
 
 export const BODY_FILE_MAP = {
   ro_novice: {
-    down:        'ro_body_down',
-    front_left:  'ro_body_front_left',
-    left:        'ro_body_left',
-    back_left:   'ro_body_back_left',
-    up:          'ro_body_up',
-    back_right:  'ro_body_back_right',
-    right:       'ro_body_right',
+    down: 'ro_body_down',
+    front_left: 'ro_body_front_left',
+    left: 'ro_body_left',
+    back_left: 'ro_body_back_left',
+    up: 'ro_body_up',
+    back_right: 'ro_body_back_right',
+    right: 'ro_body_right',
     front_right: 'ro_body_front_right'
   }
 };
 
 export const HAIR_FILE_MAP = {
   ro_novice: {
-    down:        'ro_hair_down',
-    front_left:  'ro_hair_front_left',
-    left:        'ro_hair_left',
-    back_left:   'ro_hair_back_left',
-    up:          'ro_hair_up',
-    back_right:  'ro_hair_back_right',
-    right:       'ro_hair_right',
+    down: 'ro_hair_down',
+    front_left: 'ro_hair_front_left',
+    left: 'ro_hair_left',
+    back_left: 'ro_hair_back_left',
+    up: 'ro_hair_up',
+    back_right: 'ro_hair_back_right',
+    right: 'ro_hair_right',
     front_right: 'ro_hair_front_right'
   }
 };
 
 // จุดปรับตำแหน่งหัวและทรงผม RO ค่าเริ่มต้นแยกตามทิศทางทั้ง 8 ทิศ
 export const RO_HEAD_OFFSETS = {
-  down:        { x:  0, y: 2 },
-  front_left:  { x: -2, y: 1 },
-  left:        { x:  5, y: 1 },
-  back_left:   { x:  3, y: 2 },
-  up:          { x:  0, y: 3 },
-  back_right:  { x: -3, y: 2 },
-  right:       { x: -5, y: 1 },
-  front_right: { x:  2, y: 1 }
+  down: { x: 0, y: 2 },
+  front_left: { x: -2, y: 1 },
+  left: { x: 5, y: 1 },
+  back_left: { x: 3, y: 2 },
+  up: { x: 0, y: 3 },
+  back_right: { x: -3, y: 2 },
+  right: { x: -5, y: 1 },
+  front_right: { x: 2, y: 1 }
 };
 
 // ความสูงกะโหลกศีรษะมาตรฐาน (Base Head Height) แยกตามทิศ
 export const RO_HEAD_BASE_H = {
-  down:        27,
-  front_left:  26,
-  left:        26,
-  back_left:   26,
-  up:          28,
-  back_right:  26,
-  right:       26,
+  down: 27,
+  front_left: 26,
+  left: 26,
+  back_left: 26,
+  up: 28,
+  back_right: 26,
+  right: 26,
   front_right: 26
 };
 

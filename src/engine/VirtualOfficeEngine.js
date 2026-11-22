@@ -226,7 +226,9 @@ export class VirtualOfficeEngine {
     this.me.isMoving = false;
 
     if (newAction === 'sit' && this.me.action === 'sit') {
-      this.me.sitVariant = (this.me.sitVariant + 1) % 3;
+      newAction = 'idle';
+    } else if (newAction === 'sleep' && this.me.action === 'sleep') {
+      newAction = 'idle';
     }
     if (this.me.action !== newAction) {
       this.me.actionStartTime = performance.now();
@@ -243,6 +245,20 @@ export class VirtualOfficeEngine {
     const k = CODE_TO_KEY[e.code] || e.key.toLowerCase();
     this.keys[k] = true;
     this.me.lastActiveTime = performance.now();
+
+    // สไตล์ RO: ขณะกำลังนั่ง พอกดปุ่มทิศทาง จะหมุนหันไปทางนั้นทันทีในท่านั่งโดยไม่เดิน
+    if (this.me.action === 'sit') {
+      let dxKey = 0;
+      let dyKey = 0;
+      if (this.keys['w'] || this.keys['arrowup']) dyKey -= 1;
+      if (this.keys['s'] || this.keys['arrowdown']) dyKey += 1;
+      if (this.keys['a'] || this.keys['arrowleft']) dxKey -= 1;
+      if (this.keys['d'] || this.keys['arrowright']) dxKey += 1;
+      if (dxKey !== 0 || dyKey !== 0) {
+        this.me.facing = get8Direction(dxKey, dyKey);
+        this.emitStateChange();
+      }
+    }
 
     if (SHORTCUT_MAP[k]) {
       this.setAction(SHORTCUT_MAP[k]);
@@ -281,6 +297,16 @@ export class VirtualOfficeEngine {
     const cx = (e.clientX - rect.left) * scaleX;
     const cy = (e.clientY - rect.top) * scaleY;
     if (cy > 95 && cy < 575) {
+      if (this.me.action === 'sit') {
+        // สไตล์ RO: คลิกพื้นขณะนั่ง จะหมุนหันไปทางนั้นในท่านั่งโดยไม่ลุกเดิน
+        this.me.facing = get8Direction(cx - this.me.x, cy - this.me.y);
+        this.me.targetX = this.me.x;
+        this.me.targetY = this.me.y;
+        this.me.isMoving = false;
+        this.me.lastActiveTime = performance.now();
+        this.emitStateChange();
+        return;
+      }
       this.me.targetX = cx;
       this.me.targetY = cy;
       this.me.lastActiveTime = performance.now();
@@ -334,16 +360,24 @@ export class VirtualOfficeEngine {
     if (this.keys['d'] || this.keys['arrowright']) dxKey += 1;
 
     if (dxKey !== 0 || dyKey !== 0) {
-      const len = Math.hypot(dxKey, dyKey);
-      this.me.x += (dxKey / len) * speed;
-      this.me.y += (dyKey / len) * speed;
-      this.me.targetX = this.me.x;
-      this.me.targetY = this.me.y;
-      this.me.isMoving = true;
-      this.me.facing = get8Direction(dxKey, dyKey);
+      if (this.me.action === 'sit') {
+        // สไตล์ Ragnarok Online: ขณะกำลังนั่ง พอกดปุ่มทิศทาง จะไม่เดินและไม่ลุก แต่จะหมุนหันไปทางนั้นในท่านั่ง
+        this.me.facing = get8Direction(dxKey, dyKey);
+        this.me.isMoving = false;
+        this.me.targetX = this.me.x;
+        this.me.targetY = this.me.y;
+      } else {
+        const len = Math.hypot(dxKey, dyKey);
+        this.me.x += (dxKey / len) * speed;
+        this.me.y += (dyKey / len) * speed;
+        this.me.targetX = this.me.x;
+        this.me.targetY = this.me.y;
+        this.me.isMoving = true;
+        this.me.facing = get8Direction(dxKey, dyKey);
 
-      if (this.me.action !== 'idle') {
-        this.me.action = 'idle';
+        if (this.me.action !== 'idle') {
+          this.me.action = 'idle';
+        }
       }
     } else {
       const dx = this.me.targetX - this.me.x;
@@ -351,10 +385,17 @@ export class VirtualOfficeEngine {
       const dist = Math.hypot(dx, dy);
 
       if (dist > 3) {
-        this.me.x += (dx / dist) * speed;
-        this.me.y += (dy / dist) * speed;
-        this.me.facing = get8Direction(dx, dy);
-        this.me.isMoving = true;
+        if (this.me.action === 'sit') {
+          this.me.facing = get8Direction(dx, dy);
+          this.me.isMoving = false;
+          this.me.targetX = this.me.x;
+          this.me.targetY = this.me.y;
+        } else {
+          this.me.x += (dx / dist) * speed;
+          this.me.y += (dy / dist) * speed;
+          this.me.facing = get8Direction(dx, dy);
+          this.me.isMoving = true;
+        }
       } else {
         this.me.isMoving = false;
       }

@@ -297,9 +297,9 @@ function renderCreatorPreview(time) {
     previewCtx.save();
     previewCtx.translate(cx, cy - 10);
     drawModularAvatar(previewCtx, draftAvatar, engine.sheets, time, {
-      isMoving: previewPose !== 'idle',
+      isMoving: previewPose === 'walk' || previewPose === 'run',
       isRunning: previewPose === 'run',
-      action: 'idle',
+      action: previewPose === 'sit' ? 'sit' : previewPose === 'sleep' ? 'sleep' : 'idle',
       facing: draftAvatar.facing,
       scale: 0.58
     });
@@ -333,5 +333,6 @@ window.addEventListener('resize', updateCreatorScale);
 
 selectCharacter('ro_novice');
 engine.start();
+window.engine = engine;
 updateCreatorScale();
 requestAnimationFrame(renderCreatorPreview);

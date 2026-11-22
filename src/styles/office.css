@@ -3,6 +3,27 @@
   margin: 0;
   padding: 0;
   font-family: 'Tahoma', 'Segoe UI', sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Custom sleek scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.45);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(56, 189, 248, 0.5);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(56, 189, 248, 0.85);
 }
 
 body {
@@ -10,6 +31,7 @@ body {
   color: #fff;
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   user-select: none;
 }
@@ -18,27 +40,37 @@ body {
   position: relative;
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
   background: #1a2030;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .office-canvas {
   display: block;
-  width: 100%;
-  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  aspect-ratio: 960 / 640;
+  object-fit: contain;
   cursor: pointer;
 }
 
 /* Top HUD ในออฟฟิศ */
 .top-hud {
   position: absolute;
-  top: 16px;
-  left: 24px;
-  right: 24px;
+  top: 14px;
+  left: 20px;
+  right: 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   pointer-events: none;
+  z-index: 10;
+  gap: 12px;
 }
 
 .top-hud-right {
@@ -52,13 +84,14 @@ body {
   background: rgba(15, 23, 42, 0.9);
   border: 1.5px solid #475569;
   border-radius: 999px;
-  padding: 8px 18px;
-  font-size: 14px;
+  padding: 7px 16px;
+  font-size: 13px;
   color: #f8fafc;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+  white-space: nowrap;
 }
 
 .open-creator-btn {
@@ -66,12 +99,13 @@ body {
   border: 1.5px solid #fde68a;
   color: #0f172a;
   font-weight: bold;
-  font-size: 14px;
-  padding: 8px 18px;
+  font-size: 13px;
+  padding: 7px 16px;
   border-radius: 999px;
   cursor: pointer;
   box-shadow: 0 4px 14px rgba(245, 158, 11, 0.45);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
+  white-space: nowrap;
 }
 
 .open-creator-btn:hover {
@@ -80,36 +114,38 @@ body {
 }
 
 .status-dot {
-  width: 10px;
-  height: 10px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
   background: #22c55e;
   box-shadow: 0 0 8px #22c55e;
+  flex-shrink: 0;
 }
 
 /* Bottom Action & Emote Bar ในออฟฟิศ */
 .hud-bottom {
   position: absolute;
-  bottom: 16px;
+  bottom: 12px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   width: 96%;
   max-width: 1200px;
+  z-index: 10;
 }
 
 .emote-bar {
   background: rgba(15, 23, 42, 0.94);
   border: 1.5px solid #475569;
-  border-radius: 14px;
-  padding: 8px 12px;
+  border-radius: 12px;
+  padding: 6px 10px;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.65);
 }
 
@@ -117,14 +153,15 @@ body {
   background: #1e293b;
   border: 1px solid #334155;
   color: #e2e8f0;
-  padding: 7px 13px;
-  border-radius: 9px;
-  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12.5px;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 6px;
   transition: all 0.15s ease;
+  white-space: nowrap;
 }
 
 .emote-btn:hover {
@@ -143,9 +180,9 @@ body {
 
 .emote-btn kbd {
   background: rgba(0, 0, 0, 0.35);
-  padding: 2px 6px;
+  padding: 2px 5px;
   border-radius: 4px;
-  font-size: 11px;
+  font-size: 10.5px;
   color: #94a3b8;
 }
 
@@ -157,9 +194,10 @@ body {
   background: rgba(15, 23, 42, 0.88);
   border: 1px solid #334155;
   border-radius: 999px;
-  padding: 6px 18px;
-  font-size: 13px;
+  padding: 5px 16px;
+  font-size: 12.5px;
   color: #cbd5e1;
+  text-align: center;
 }
 
 .guide-text b {
@@ -167,7 +205,7 @@ body {
 }
 
 /* =========================================================
-   RPG CHARACTER CREATOR SCREEN (สมดุลเต็มจอ Full HD)
+   RPG CHARACTER CREATOR SCREEN (Auto-Scaled Universal UI)
    ========================================================= */
 .creator-overlay {
   position: absolute;
@@ -198,87 +236,123 @@ body {
 }
 
 .creator-topbar {
-  height: 60px;
-  background: rgba(15, 23, 42, 0.78);
+  min-height: 48px;
+  height: 48px;
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(8px);
   border-bottom: 1px solid rgba(148, 163, 184, 0.35);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 32px;
-  z-index: 2;
+  padding: 0 24px;
+  z-index: 10;
+  flex-shrink: 0;
 }
 
 .creator-back-btn {
   background: rgba(255, 255, 255, 0.14);
   border: 1.5px solid rgba(255, 255, 255, 0.3);
   color: #fff;
-  padding: 8px 20px;
+  padding: 6px 14px;
   border-radius: 8px;
-  font-size: 17px;
+  font-size: 14px;
   font-weight: bold;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   transition: background 0.15s ease;
+  white-space: nowrap;
 }
 
 .creator-back-btn:hover {
   background: rgba(255, 255, 255, 0.26);
 }
 
-.creator-body {
+.creator-topbar-subtitle {
+  font-size: 12.5px;
+  color: #e2e8f0;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+/* เวทีหลัก: จัดการขยาย/ย่อสเกลให้อยู่กึ่งกลางจออย่างสมบูรณ์แบบเสมอ */
+.creator-stage-area {
   flex: 1;
-  display: grid;
-  grid-template-columns: 380px 1fr 440px;
-  padding: 24px 36px 28px;
-  gap: 32px;
-  z-index: 2;
-  min-height: 0;
-  max-width: 1820px;
   width: 100%;
-  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  min-height: 0;
+}
+
+/* กล่องดีไซน์ขนาดหลัก 1260 x 660 px ปรับสเกลอัตโนมัติตามทุกขนาดหน้าจอ */
+.creator-body-wrapper {
+  width: 1260px;
+  height: 660px;
+  display: grid;
+  grid-template-columns: 330px 1fr 370px;
+  gap: 20px;
+  padding: 10px 16px;
+  z-index: 2;
+  align-items: stretch;
+  flex-shrink: 0;
+  transform-origin: center center;
+  transition: transform 0.08s ease-out;
 }
 
 .panel-section-title {
-  font-size: 18px;
+  font-size: 15px;
   font-weight: bold;
   color: #f8fafc;
-  padding-bottom: 8px;
-  margin-bottom: 14px;
-  border-bottom: 2.5px solid #38bdf8;
+  padding-bottom: 4px;
+  margin-bottom: 8px;
+  border-bottom: 2px solid #38bdf8;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.65);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-shrink: 0;
 }
 
-/* ฝั่งซ้าย: เลือกตัวละคร + ตั้งชื่อ */
+/* =========================================================
+   ฝั่งซ้าย: เลือกตัวละคร + ทรงผม
+   ========================================================= */
 .creator-left {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  background: rgba(15, 23, 42, 0.38);
+  background: rgba(15, 23, 42, 0.42);
   border: 1.5px solid rgba(148, 163, 184, 0.25);
-  border-radius: 14px;
-  padding: 20px 22px;
-  backdrop-filter: blur(6px);
-  align-self: start;
+  border-radius: 12px;
+  padding: 14px 16px;
+  backdrop-filter: blur(8px);
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.creator-left>div:first-child {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 .preset-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 14px;
-  margin-bottom: 18px;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  margin-bottom: 8px;
+  flex-shrink: 0;
 }
 
 .preset-card {
   width: 100%;
-  height: 175px;
+  height: 135px;
   background: linear-gradient(180deg, #ffffff 0%, #e2e8f0 100%);
-  border: 3px solid #475569;
-  border-radius: 12px;
+  border: 2.5px solid #475569;
+  border-radius: 10px;
   cursor: pointer;
   position: relative;
   overflow: hidden;
@@ -286,157 +360,141 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 6px 8px;
+  padding: 6px;
   transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
+.preset-card canvas {
+  display: block;
+  max-height: 90px;
+  width: auto;
+  object-fit: contain;
+}
+
 .preset-card:hover {
-  transform: translateY(-3px);
+  transform: translateY(-2px);
   border-color: #0284c7;
 }
 
 .preset-card.active {
   border-color: #f43f5e;
-  box-shadow: 0 0 18px rgba(244, 63, 94, 0.85);
+  box-shadow: 0 0 14px rgba(244, 63, 94, 0.85);
   background: linear-gradient(180deg, #fff1f2 0%, #ffe4e6 100%);
 }
 
 .preset-card-name {
-  font-size: 13.5px;
+  font-size: 13px;
   font-weight: bold;
   color: #0f172a;
   background: rgba(255, 255, 255, 0.92);
-  border-radius: 6px;
-  width: 94%;
+  border-radius: 5px;
+  width: 96%;
   text-align: center;
-  padding: 5px 4px;
+  padding: 3px 4px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.name-input-box {
-  margin-bottom: 14px;
-}
-
-.name-input-box label {
-  display: block;
-  font-size: 13.5px;
-  font-weight: bold;
-  color: #e2e8f0;
-  margin-bottom: 6px;
-}
-
-.name-input-box input {
-  width: 100%;
-  background: rgba(15, 23, 42, 0.85);
-  border: 2px solid #38bdf8;
-  border-radius: 8px;
-  padding: 10px 14px;
-  color: #fef08a;
-  font-size: 16px;
-  font-weight: bold;
-  outline: none;
-}
-
-.stats-box {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 16px;
+.hair-grid {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 6px 4px;
   background: rgba(15, 23, 42, 0.45);
-  padding: 16px;
   border-radius: 10px;
   border: 1px solid rgba(148, 163, 184, 0.2);
 }
 
-.stat-row {
-  display: grid;
-  grid-template-columns: 92px 1fr;
+.hair-item-card {
+  height: 108px;
+  background: linear-gradient(180deg, #ffffff 0%, #e2e8f0 100%);
+  border: 2px solid #64748b;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 12px;
-  font-size: 14px;
+  justify-content: space-between;
+  padding: 6px 4px;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.hair-item-card canvas {
+  display: block;
+  max-height: 72px;
+  width: auto;
+  object-fit: contain;
+}
+
+.hair-item-card:hover {
+  transform: translateY(-2px);
+  border-color: #0284c7;
+}
+
+.hair-item-card.active {
+  border-color: #f43f5e;
+  box-shadow: 0 0 10px rgba(244, 63, 94, 0.78);
+  background: linear-gradient(180deg, #fff1f2 0%, #ffe4e6 100%);
+}
+
+.hair-item-label {
+  font-size: 11.5px;
   font-weight: bold;
-  color: #e2e8f0;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
-}
-
-.stat-bar-bg {
-  height: 16px;
-  background: rgba(15, 23, 42, 0.85);
-  border: 1px solid rgba(148, 163, 184, 0.4);
+  color: #0f172a;
+  background: rgba(255, 255, 255, 0.92);
+  padding: 2px 3px;
   border-radius: 4px;
+  width: 96%;
+  text-align: center;
+  margin-top: 3px;
+  white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.stat-bar-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #0284c7, #38bdf8);
-  transition: width 0.25s ease;
-}
-
-.profession-box {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  background: rgba(15, 23, 42, 0.72);
-  border: 1.5px solid rgba(148, 163, 184, 0.35);
-  border-radius: 10px;
-  padding: 12px 16px;
-}
-
-.profession-shield {
-  width: 48px;
-  height: 52px;
-  background: linear-gradient(135deg, #fde68a, #ca8a04);
-  border: 2.5px solid #fff;
-  border-radius: 8px 8px 22px 22px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
-}
-
-.profession-info {
-  font-size: 14.5px;
-  line-height: 1.5;
-}
-
-.profession-info b {
-  color: #a3e635;
-}
-
-/* ตรงกลาง: แท่นยืนตัวละคร + คำอธิบายด้านล่าง */
+/* =========================================================
+   ตรงกลาง: แท่นยืนตัวละคร จัดตำแหน่งสมดุล 100%
+   ========================================================= */
 .creator-center {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
   position: relative;
-  padding: 6px 0;
+  padding: 2px 4px;
+  height: 100%;
+  min-height: 0;
 }
 
 .preview-controls {
   display: flex;
-  gap: 10px;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
   background: rgba(15, 23, 42, 0.75);
-  padding: 7px 14px;
+  padding: 5px 14px;
   border-radius: 999px;
   border: 1.5px solid rgba(255, 255, 255, 0.25);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  flex-shrink: 0;
 }
 
 .preview-ctrl-btn {
   background: transparent;
   border: 1.5px solid transparent;
   color: #e2e8f0;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: bold;
-  padding: 6px 16px;
+  padding: 5px 14px;
   border-radius: 999px;
   cursor: pointer;
   transition: all 0.15s ease;
+  white-space: nowrap;
 }
 
 .preview-ctrl-btn:hover,
@@ -446,135 +504,162 @@ body {
   color: #fff;
 }
 
+.creator-center .name-input-box {
+  background: rgba(15, 23, 42, 0.78);
+  border: 1.5px solid rgba(56, 189, 248, 0.35);
+  border-radius: 8px;
+  padding: 5px 14px 7px;
+  margin-top: 2px;
+  width: 100%;
+  max-width: 340px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.3);
+  z-index: 5;
+  flex-shrink: 0;
+}
+
+.creator-center .name-input-box label {
+  display: block;
+  font-size: 12.5px;
+  font-weight: bold;
+  color: #e2e8f0;
+  margin-bottom: 2px;
+}
+
+.creator-center .name-input-box input {
+  width: 100%;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1.5px solid #38bdf8;
+  border-radius: 5px;
+  padding: 6px 10px;
+  color: #fef08a;
+  font-size: 14.5px;
+  font-weight: bold;
+  outline: none;
+}
+
 .pedestal-stage {
   position: relative;
   width: 460px;
-  height: 520px;
+  height: 480px;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 #creatorPreviewCanvas {
   position: relative;
   z-index: 2;
+  width: 460px;
+  height: 520px;
+  display: block;
 }
 
 .lore-box {
   width: 100%;
-  max-width: 540px;
+  max-width: 480px;
   background: rgba(15, 20, 15, 0.78);
   border: 1.5px solid rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
-  padding: 14px 20px;
-  font-size: 14.5px;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 13px;
   color: #fde68a;
-  line-height: 1.55;
-  min-height: 80px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  line-height: 1.45;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  text-align: center;
+  flex-shrink: 0;
 }
 
-/* ฝั่งขวา: เลือกคอสตูม + ปุ่มสร้าง */
+/* =========================================================
+   ฝั่งขวา: หมุนดู 8 ทิศ + ปุ่มสร้าง ไม่ล้นขอบจอ
+   ========================================================= */
 .creator-right {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  justify-content: space-between;
+  height: 100%;
   min-height: 0;
-  gap: 16px;
-  background: rgba(15, 23, 42, 0.38);
+  gap: 10px;
+  background: rgba(15, 23, 42, 0.42);
   border: 1.5px solid rgba(148, 163, 184, 0.25);
-  border-radius: 14px;
-  padding: 20px 22px;
-  backdrop-filter: blur(6px);
-  align-self: start;
+  border-radius: 12px;
+  padding: 14px 16px;
+  backdrop-filter: blur(8px);
+  width: 100%;
 }
 
-.creator-right > div:first-child {
+.creator-right>div:first-child {
+  flex: 1;
   display: flex;
   flex-direction: column;
   min-height: 0;
 }
 
 .costume-panel {
-  background: rgba(241, 245, 249, 0.92);
-  border: 2px solid rgba(255, 255, 255, 0.75);
-  border-radius: 12px;
-  padding: 14px;
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
-}
-
-.costume-tabs {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 5px;
-}
-
-.costume-tab {
-  background: #334155;
-  border: none;
-  color: #e2e8f0;
-  padding: 9px 6px;
-  border-radius: 7px;
-  font-size: 13px;
-  font-weight: bold;
-  cursor: pointer;
-  text-align: center;
-}
-
-.costume-tab.active {
-  background: #0284c7;
-  color: #fff;
-  box-shadow: 0 0 10px rgba(2, 132, 199, 0.6);
+  min-height: 0;
+  background: rgba(241, 245, 249, 0.92);
+  border: 2px solid rgba(255, 255, 255, 0.75);
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
 }
 
 .costume-grid {
+  flex: 1;
+  min-height: 0;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-auto-rows: auto;
-  gap: 12px;
-  max-height: 520px;
+  gap: 8px;
   overflow-y: auto;
   overflow-x: hidden;
   padding: 4px;
 }
 
 .costume-item-card {
+  height: 116px;
   background: linear-gradient(180deg, #ffffff 0%, #e2e8f0 100%);
-  border: 3px solid #64748b;
-  border-radius: 12px;
+  border: 2px solid #64748b;
+  border-radius: 8px;
   cursor: pointer;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 10px 8px;
+  gap: 3px;
+  padding: 6px 4px;
   transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
+.costume-item-card canvas {
+  display: block;
+  max-height: 80px;
+  width: auto;
+  object-fit: contain;
+}
+
 .costume-item-card:hover {
-  transform: translateY(-3px);
+  transform: translateY(-2px);
   border-color: #0284c7;
 }
 
 .costume-item-card.active {
   border-color: #f43f5e;
-  box-shadow: 0 0 16px rgba(244, 63, 94, 0.78);
+  box-shadow: 0 0 12px rgba(244, 63, 94, 0.78);
   background: linear-gradient(180deg, #fff1f2 0%, #ffe4e6 100%);
 }
 
 .costume-item-label {
-  font-size: 13.5px;
+  font-size: 11.5px;
   font-weight: bold;
   color: #0f172a;
   background: rgba(255, 255, 255, 0.92);
-  border-radius: 6px;
-  padding: 5px 6px;
+  border-radius: 4px;
+  padding: 2px 4px;
   text-align: center;
-  width: 94%;
+  width: 96%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -583,6 +668,8 @@ body {
 .creator-action-btns {
   display: flex;
   gap: 12px;
+  width: 100%;
+  flex-shrink: 0;
 }
 
 .btn-create-gold {
@@ -590,31 +677,120 @@ body {
   background: linear-gradient(180deg, #fbbf24 0%, #d97706 100%);
   border: 2px solid #fef08a;
   color: #fff;
-  font-size: 18px;
+  font-size: 16.5px;
   font-weight: bold;
-  padding: 13px 16px;
+  padding: 12px 16px;
   border-radius: 10px;
   cursor: pointer;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-  box-shadow: 0 6px 18px rgba(217, 119, 6, 0.55);
+  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.5);
+  transition: filter 0.15s ease, transform 0.15s ease;
 }
 
 .btn-create-gold:hover {
   filter: brightness(1.08);
+  transform: translateY(-1px);
 }
 
 .btn-spawn-friend {
   background: linear-gradient(180deg, #0ea5e9 0%, #0284c7 100%);
   border: 2px solid #bae6fd;
   color: #fff;
-  font-size: 14.5px;
+  font-size: 13.5px;
   font-weight: bold;
-  padding: 13px 16px;
+  padding: 12px 14px;
   border-radius: 10px;
   cursor: pointer;
   white-space: nowrap;
+  transition: filter 0.15s ease, transform 0.15s ease;
 }
 
 .btn-spawn-friend:hover {
   filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+/* =========================================================
+   โหมด Mobile (< 768px): สลับเป็น Layout แนวตั้งเลื่อนจอได้
+   ========================================================= */
+.creator-body-wrapper.mobile-layout {
+  width: 100% !important;
+  height: auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 14px !important;
+  padding: 10px 8px 48px !important;
+  transform: none !important;
+}
+
+.creator-stage-area:has(.mobile-layout) {
+  overflow-y: auto !important;
+  align-items: flex-start !important;
+}
+
+@media (max-width: 767px) {
+  .creator-stage-area {
+    overflow-y: auto;
+    align-items: flex-start;
+  }
+
+  .creator-body-wrapper {
+    width: 100% !important;
+    height: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 14px !important;
+    padding: 10px 8px 48px !important;
+    transform: none !important;
+  }
+
+  .creator-center {
+    order: 1;
+    width: 100%;
+    height: auto;
+  }
+
+  .pedestal-stage {
+    width: 100%;
+    max-width: 320px;
+    height: 320px;
+  }
+
+  #creatorPreviewCanvas {
+    width: 320px;
+    height: 360px;
+  }
+  .creator-left {
+    order: 2;
+    width: 100%;
+    height: auto;
+    padding: 10px;
+  }
+
+  .hair-grid {
+    grid-template-columns: repeat(3, 1fr);
+    max-height: 240px;
+  }
+
+  .creator-right {
+    order: 3;
+    width: 100%;
+    height: auto;
+    padding: 10px;
+  }
+
+  .costume-grid {
+    grid-template-columns: repeat(4, 1fr);
+    max-height: 220px;
+  }
+
+  .creator-action-btns {
+    order: 4;
+    position: sticky;
+    bottom: 8px;
+    z-index: 30;
+  }
+
 }

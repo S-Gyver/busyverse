@@ -1,6 +1,6 @@
 import { EMOTE_BUTTONS, DEFAULT_GUIDE_HTML } from './config/officeZones.js';
 import { VirtualOfficeEngine } from './engine/VirtualOfficeEngine.js';
-import { drawModularAvatar, drawBaseBodyCard } from './engine/modularAvatarRenderer.js';
+import { drawModularAvatar, drawBaseBodyCard, drawHairThumbCard } from './engine/modularAvatarRenderer.js';
 
 const canvas = document.getElementById('officeCanvas');
 const statusDotEl = document.getElementById('statusDot');
@@ -14,49 +14,51 @@ const creatorOverlayEl = document.getElementById('creatorOverlay');
 const btnOpenCreator = document.getElementById('btnOpenCreator');
 const btnCloseCreator = document.getElementById('btnCloseCreator');
 const presetGridEl = document.getElementById('presetGrid');
+const hairGridEl = document.getElementById('hairGrid');
+const hairSelectLabel = document.getElementById('hairSelectLabel');
 const charNameInput = document.getElementById('charNameInput');
-const costumeTabsEl = document.getElementById('costumeTabs');
 const costumeGridEl = document.getElementById('costumeGrid');
 const costumeCategoryLabel = document.getElementById('costumeCategoryLabel');
 const previewCanvas = document.getElementById('creatorPreviewCanvas');
 const previewCtx = previewCanvas.getContext('2d');
 const btnCreateConfirm = document.getElementById('btnCreateConfirm');
 const btnSpawnFriend = document.getElementById('btnSpawnFriend');
-const btnRandomize = document.getElementById('btnRandomize');
 
-// Step 1 State: เลือกเพศ (male / female) และทิศทางการหัน (down=หน้า, left=ซ้าย, right=ขวา, up=หลัง)
+// สถานะการเลือกตัวละคร (ตั้งค่าเริ่มต้นเป็น RO Novice Male 8 ทิศ + ผมทรงที่ 1)
 const draftAvatar = {
   mode: 'modular',
+  character: 'ro_novice',
+  isRO: true,
   gender: 'male',
+  hair: 1,
   facing: 'down'
 };
 
 let previewPose = 'idle';
 
-const GENDER_OPTIONS = [
+const CHARACTER_OPTIONS = [
   {
+    id: 'ro_novice',
+    character: 'ro_novice',
+    isRO: true,
     gender: 'male',
-    label: 'เพศชาย (Male)',
-    profession: 'Male Character',
-    race: 'Human (ชาย)',
-    desc: 'หุ่นมาตรฐานเพศชาย สามารถกดเลือกหันหน้า หันซ้าย หันขวา และหันหลังได้จากตารางฝั่งขวา',
-    stats: { str: 85, int: 75, agg: 80, dex: 75, hp: 90 }
-  },
-  {
-    gender: 'female',
-    label: 'เพศหญิง (Female)',
-    profession: 'Female Character',
-    race: 'Human (หญิง)',
-    desc: 'หุ่นมาตรฐานเพศหญิง สามารถกดเลือกหันหน้า หันซ้าย หันขวา และหันหลังได้จากตารางฝั่งขวา',
-    stats: { str: 65, int: 90, agg: 60, dex: 90, hp: 85 }
+    label: 'RO Novice (8 ทิศ)',
+    profession: 'Novice (ชาย)',
+    race: 'Ragnarok Online',
+    desc: 'ตัวละคร Novice ชาย จาก Ragnarok Online รองรับการหันครบ 8 ทิศทาง พร้อมทรงผม 30 แบบ',
+    stats: { str: 90, int: 80, agg: 85, dex: 85, hp: 95 }
   }
 ];
 
-const FACING_DIRECTIONS = [
-  { dir: 'down',  label: 'หันหน้า (Front)' },
-  { dir: 'left',  label: 'หันซ้าย (Left)' },
-  { dir: 'right', label: 'หันขวา (Right)' },
-  { dir: 'up',    label: 'หันหลัง (Back)' }
+const RO_FACING_DIRECTIONS = [
+  { dir: 'down',        label: 'หน้าตรง (S 0)' },
+  { dir: 'front_left',  label: 'หน้าซ้าย (SW 1)' },
+  { dir: 'left',        label: 'หันซ้าย (W 2)' },
+  { dir: 'back_left',   label: 'หลังซ้าย (NW 3)' },
+  { dir: 'up',          label: 'หลังตรง (N 4)' },
+  { dir: 'back_right',  label: 'หลังขวา (NE 5)' },
+  { dir: 'right',       label: 'หันขวา (E 6)' },
+  { dir: 'front_right', label: 'หน้าขวา (SE 7)' }
 ];
 
 emoteBarEl.innerHTML = EMOTE_BUTTONS.map(
@@ -84,44 +86,64 @@ const engine = new VirtualOfficeEngine(canvas, {
     }
   },
   onSheetsProgress() {
-    renderGenderLeftPanel();
-    renderDirectionRightPanel();
+    renderCharacterLeftPanel();
+    renderHairLeftPanel();
+    renderRightPanel();
   }
 });
 
+// เริ่มต้นเปิดหน้าสร้างตัวละคร
 engine.npcs = [];
 engine.setCreatorOpen(true);
 
-if (btnRandomize) btnRandomize.style.display = 'none';
-
-costumeTabsEl.innerHTML = `
-  <button class="costume-tab active" data-cat="direction" style="grid-column: span 6;">
-    หมุนดูมุมหุ่นตัวละคร (หันหน้า / หันซ้าย / หันขวา / หันหลัง)
-  </button>
-`;
-
-function renderGenderLeftPanel() {
-  presetGridEl.innerHTML = GENDER_OPTIONS.map(opt => {
-    const isActive = draftAvatar.gender === opt.gender;
+function renderCharacterLeftPanel() {
+  presetGridEl.innerHTML = CHARACTER_OPTIONS.map(opt => {
+    const isActive =
+      draftAvatar.character === opt.character &&
+      Boolean(draftAvatar.isRO) === Boolean(opt.isRO);
     return `
-      <div class="preset-card${isActive ? ' active' : ''}" data-gender="${opt.gender}">
-        <canvas width="128" height="125" id="gender_card_${opt.gender}"></canvas>
+      <div class="preset-card${isActive ? ' active' : ''}" data-char-id="${opt.id}">
+        <canvas width="128" height="125" id="char_card_${opt.id}"></canvas>
         <div class="preset-card-name">${opt.label}</div>
       </div>
     `;
   }).join('');
 
-  GENDER_OPTIONS.forEach(opt => {
-    const c = document.getElementById(`gender_card_${opt.gender}`);
-    drawBaseBodyCard(c, opt.gender, 'down', engine.sheets);
+  CHARACTER_OPTIONS.forEach(opt => {
+    const c = document.getElementById(`char_card_${opt.id}`);
+    drawBaseBodyCard(c, opt.character, 'down', engine.sheets, draftAvatar.hair || 1);
   });
 }
 
-function renderDirectionRightPanel() {
-  const genderTitle = draftAvatar.gender === 'male' ? 'เพศชาย' : 'เพศหญิง';
-  costumeCategoryLabel.textContent = `${genderTitle} (4 ทิศทาง)`;
+function renderHairLeftPanel() {
+  if (!hairGridEl) return;
+  const hairList = Array.from({ length: 30 }, (_, i) => i + 1);
+  if (hairSelectLabel) {
+    hairSelectLabel.textContent = `ทรงที่ ${draftAvatar.hair || 1}/30`;
+  }
 
-  costumeGridEl.innerHTML = FACING_DIRECTIONS.map(f => {
+  hairGridEl.innerHTML = hairList.map(hId => {
+    const isSelected = (draftAvatar.hair || 1) === hId;
+    return `
+      <div class="hair-item-card${isSelected ? ' active' : ''}" data-hair-id="${hId}">
+        <canvas width="120" height="110" id="hair_left_thumb_${hId}"></canvas>
+        <div class="hair-item-label">ทรงผมที่ ${hId}</div>
+      </div>
+    `;
+  }).join('');
+
+  hairList.forEach(hId => {
+    const c = document.getElementById(`hair_left_thumb_${hId}`);
+    drawHairThumbCard(c, hId, engine.sheets);
+  });
+}
+
+function renderRightPanel() {
+  if (costumeCategoryLabel) {
+    costumeCategoryLabel.textContent = 'RO Novice ท่ายืน (8 ทิศทาง)';
+  }
+
+  costumeGridEl.innerHTML = RO_FACING_DIRECTIONS.map(f => {
     const isSelected = draftAvatar.facing === f.dir;
     return `
       <div class="costume-item-card${isSelected ? ' active' : ''}" data-dir="${f.dir}">
@@ -131,37 +153,53 @@ function renderDirectionRightPanel() {
     `;
   }).join('');
 
-  FACING_DIRECTIONS.forEach(f => {
+  RO_FACING_DIRECTIONS.forEach(f => {
     const c = document.getElementById(`dir_thumb_${f.dir}`);
-    drawBaseBodyCard(c, draftAvatar.gender, f.dir, engine.sheets);
+    drawBaseBodyCard(c, draftAvatar.character, f.dir, engine.sheets, draftAvatar.hair || 1);
   });
 }
 
-function selectGender(gender) {
-  const opt = GENDER_OPTIONS.find(g => g.gender === gender) || GENDER_OPTIONS[0];
+function selectCharacter(charId) {
+  const opt = CHARACTER_OPTIONS.find(c => c.id === charId) || CHARACTER_OPTIONS[0];
+  draftAvatar.character = opt.character;
   draftAvatar.gender = opt.gender;
+  draftAvatar.isRO = Boolean(opt.isRO);
 
   const loreEl = document.getElementById('loreDesc');
   if (loreEl) loreEl.textContent = opt.desc;
 
-  renderGenderLeftPanel();
-  renderDirectionRightPanel();
+  renderCharacterLeftPanel();
+  renderHairLeftPanel();
+  renderRightPanel();
 }
 
-// คลิกเลือกเพศ ชาย / หญิง ฝั่งซ้าย
 presetGridEl.addEventListener('click', e => {
   const card = e.target.closest('.preset-card');
-  if (card && card.dataset.gender) {
-    selectGender(card.dataset.gender);
+  if (card && card.dataset.charId) {
+    selectCharacter(card.dataset.charId);
   }
 });
 
-// คลิกเลือกทิศทาง (หันหน้า / หันซ้าย / หันขวา / หันหลัง) ฝั่งขวา
+// คลิกเลือกทรงผมที่อยู่ฝั่งซ้าย (ใต้เลือกตัวละคร)
+if (hairGridEl) {
+  hairGridEl.addEventListener('click', e => {
+    const hairCard = e.target.closest('.hair-item-card[data-hair-id]');
+    if (hairCard) {
+      draftAvatar.hair = Number(hairCard.dataset.hairId);
+      renderHairLeftPanel();
+      renderCharacterLeftPanel();
+      renderRightPanel();
+    }
+  });
+}
+
+// คลิกเลือกทิศทางที่อยู่ฝั่งขวา
 costumeGridEl.addEventListener('click', e => {
-  const card = e.target.closest('.costume-item-card');
-  if (!card || !card.dataset.dir) return;
-  draftAvatar.facing = card.dataset.dir;
-  renderDirectionRightPanel();
+  const dirCard = e.target.closest('.costume-item-card[data-dir]');
+  if (dirCard) {
+    draftAvatar.facing = dirCard.dataset.dir;
+    renderRightPanel();
+  }
 });
 
 document.querySelectorAll('.preview-ctrl-btn[data-pose]').forEach(btn => {
@@ -181,8 +219,10 @@ function closeCreator() {
 function openCreator() {
   creatorOverlayEl.classList.remove('hidden');
   engine.setCreatorOpen(true);
-  renderGenderLeftPanel();
-  renderDirectionRightPanel();
+  renderCharacterLeftPanel();
+  renderHairLeftPanel();
+  renderRightPanel();
+  updateCreatorScale();
 }
 
 btnOpenCreator.addEventListener('click', openCreator);
@@ -198,7 +238,7 @@ btnSpawnFriend.addEventListener('click', () => {
   const friendNum = engine.npcs.length + 1;
   const customName =
     charNameInput.value.trim() === 'คุณ (Lead)'
-      ? `เพื่อน #${friendNum}`
+      ? `เพื่อน RO #${friendNum}`
       : charNameInput.value.trim();
   engine.spawnFriend(customName, draftAvatar);
   btnSpawnFriend.textContent = `✅ เพิ่มแล้ว (${engine.npcs.length + 1} คน)`;
@@ -217,53 +257,81 @@ emoteBarEl.addEventListener('click', e => {
 function renderCreatorPreview(time) {
   if (!creatorOverlayEl.classList.contains('hidden')) {
     previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+    previewCtx.imageSmoothingEnabled = false;
 
     const cx = previewCanvas.width / 2;
-    const cy = 435;
+    const cy = 375;
+    const pedRadiusX = 84;
+    const pedRadiusY = 19;
+    const pedHeight = 20;
 
     previewCtx.save();
-    previewCtx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+    previewCtx.fillStyle = 'rgba(0, 0, 0, 0.32)';
     previewCtx.beginPath();
-    previewCtx.ellipse(cx, cy + 36, 136, 30, 0, 0, Math.PI * 2);
+    previewCtx.ellipse(cx, cy + pedHeight + 4, pedRadiusX * 1.12, pedRadiusY * 1.1, 0, 0, Math.PI * 2);
     previewCtx.fill();
 
-    const gradSide = previewCtx.createLinearGradient(cx - 120, cy, cx + 120, cy + 40);
+    const gradSide = previewCtx.createLinearGradient(cx - pedRadiusX, cy, cx + pedRadiusX, cy + pedHeight + 10);
     gradSide.addColorStop(0, '#a16207');
     gradSide.addColorStop(0.5, '#eab308');
     gradSide.addColorStop(1, '#713f12');
     previewCtx.fillStyle = gradSide;
     previewCtx.beginPath();
-    previewCtx.ellipse(cx, cy + 24, 118, 28, 0, 0, Math.PI);
-    previewCtx.rect(cx - 118, cy - 6, 236, 30);
+    previewCtx.ellipse(cx, cy + pedHeight - 6, pedRadiusX, pedRadiusY, 0, 0, Math.PI);
+    previewCtx.rect(cx - pedRadiusX, cy - 6, pedRadiusX * 2, pedHeight);
     previewCtx.fill();
 
-    const gradTop = previewCtx.createRadialGradient(cx, cy - 6, 14, cx, cy - 6, 118);
+    const gradTop = previewCtx.createRadialGradient(cx, cy - 6, 10, cx, cy - 6, pedRadiusX);
     gradTop.addColorStop(0, '#fef08a');
     gradTop.addColorStop(1, '#ca8a04');
     previewCtx.fillStyle = gradTop;
     previewCtx.strokeStyle = '#fef9c3';
-    previewCtx.lineWidth = 2.5;
+    previewCtx.lineWidth = 2;
     previewCtx.beginPath();
-    previewCtx.ellipse(cx, cy - 6, 118, 28, 0, 0, Math.PI * 2);
+    previewCtx.ellipse(cx, cy - 6, pedRadiusX, pedRadiusY, 0, 0, Math.PI * 2);
     previewCtx.fill();
     previewCtx.stroke();
     previewCtx.restore();
 
-    // วาดหุ่นขนาดใหญ่สมดุลกับหน้าจอ Full Screen
+    // วาดตัวละครขนาดกะทัดรัดบนแท่นยืน (ย่อลงให้สมส่วนพอดี)
     previewCtx.save();
-    previewCtx.translate(cx, cy - 12);
+    previewCtx.translate(cx, cy - 10);
     drawModularAvatar(previewCtx, draftAvatar, engine.sheets, time, {
       isMoving: previewPose !== 'idle',
       isRunning: previewPose === 'run',
       action: 'idle',
       facing: draftAvatar.facing,
-      scale: 1.08
+      scale: 0.58
     });
     previewCtx.restore();
   }
   requestAnimationFrame(renderCreatorPreview);
 }
 
-selectGender('male');
+function updateCreatorScale() {
+  const stage = document.getElementById('creatorStageArea');
+  const wrapper = document.getElementById('creatorBodyWrapper');
+  if (!stage || !wrapper) return;
+
+  const w = stage.clientWidth;
+  const h = stage.clientHeight;
+
+  if (w < 768) {
+    wrapper.classList.add('mobile-layout');
+    wrapper.style.transform = '';
+  } else {
+    wrapper.classList.remove('mobile-layout');
+    // อัตราส่วนพื้นที่ดีไซน์หลัก 1260 x 660 px (รองรับการขยายและย่อทุกขนาดหน้าจอโดยอัตโนมัติ)
+    const scaleX = (w - 12) / 1260;
+    const scaleY = (h - 12) / 660;
+    const scale = Math.min(scaleX, scaleY);
+    wrapper.style.transform = `scale(${Math.max(0.4, scale).toFixed(3)})`;
+  }
+}
+
+window.addEventListener('resize', updateCreatorScale);
+
+selectCharacter('ro_novice');
 engine.start();
+updateCreatorScale();
 requestAnimationFrame(renderCreatorPreview);

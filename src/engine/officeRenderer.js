@@ -1,4 +1,3 @@
-import { ANIMATIONS } from '../config/spritesConfig.js';
 import { drawModularAvatar } from './modularAvatarRenderer.js';
 
 // วาดฉากออฟฟิศทั้งหมดบน Canvas
@@ -85,79 +84,32 @@ export function drawOffice(ctx, canvas, activeZone) {
   }
 }
 
-// วาดตัวละคร (รองรับทั้งโหมด Modular Custom Avatar และโหมด Classic 15-Sheet)
+// วาดตัวละคร RO บน Canvas
 export function drawPlayer(ctx, charObj, sheets, time, isMainPlayer = true) {
   ctx.save();
   ctx.translate(charObj.x, charObj.y);
 
-  // เงาใต้เท้า
-  if (charObj.action !== 'sleep' || (charObj.avatar && charObj.avatar.mode === 'modular')) {
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.36)';
-    ctx.beginPath();
-    ctx.ellipse(0, 5, 22, 8, 0, 0, Math.PI * 2);
-    ctx.fill();
-  }
+  // เงาใต้เท้า (รองรับพอดี 2 ฝ่าเท้า ไม่ให้เท้าข้างใดข้างหนึ่งลอย)
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.22)';
+  ctx.beginPath();
+  ctx.ellipse(-5, -10, 20, 10, 0, 0, Math.PI * 2);
+  ctx.fill();
 
-  const useModular = charObj.avatar && charObj.avatar.mode === 'modular';
+  const avatar = charObj.avatar || {
+    character: 'ro_novice',
+    isRO: true,
+    gender: 'male',
+    hair: 1,
+    facing: charObj.facing || 'down'
+  };
 
-  if (useModular) {
-    drawModularAvatar(ctx, charObj.avatar, sheets, time, {
-      isMoving: charObj.isMoving,
-      isRunning: charObj.isRunning,
-      action: charObj.action,
-      facing: charObj.facing,
-      scale: 0.275
-    });
-  } else {
-    let animKey = 'idle_down';
-    if (charObj.isMoving) {
-      animKey = (charObj.isRunning ? 'run_' : 'walk_') + charObj.facing;
-    } else if (charObj.action !== 'idle') {
-      animKey = charObj.action;
-    } else {
-      animKey = 'idle_' + charObj.facing;
-    }
-
-    let anim = ANIMATIONS[animKey] || ANIMATIONS.idle_down;
-    let sheet = sheets[anim.sheet];
-
-    if (!(sheet && sheet.complete && sheet.naturalWidth > 0)) {
-      anim = ANIMATIONS['idle_' + charObj.facing] || ANIMATIONS.idle_down;
-      sheet = sheets[anim.sheet];
-    }
-
-    const scale = anim.scale || 0.25;
-    const elapsed = Math.max(0, time - (charObj.actionStartTime || 0));
-
-    let frameIdx = 0;
-    if (animKey === 'sit') {
-      frameIdx = (charObj.sitVariant || 0) % anim.frames.length;
-    } else if (animKey === 'sleep') {
-      const step = Math.floor((elapsed / 1000) * anim.fps);
-      frameIdx = step < 3 ? step : (3 + ((step - 3) % 2));
-    } else if (anim.fps > 0 && anim.frames.length > 1) {
-      const baseTime = charObj.isMoving ? time : elapsed;
-      frameIdx = Math.floor((baseTime / 1000) * anim.fps) % anim.frames.length;
-    }
-    const frame = anim.frames[frameIdx] || anim.frames[0];
-
-    if (sheet && sheet.complete && sheet.naturalWidth > 0) {
-      const drawW = frame.w * scale;
-      const drawH = frame.h * scale;
-      const ox = (frame.ox || 0) * scale;
-
-      ctx.save();
-      if (anim.flipX) {
-        ctx.scale(-1, 1);
-      }
-      ctx.drawImage(
-        sheet,
-        frame.x, frame.y, frame.w, frame.h,
-        -drawW / 2 + ox, -drawH + 10, drawW, drawH
-      );
-      ctx.restore();
-    }
-  }
+  drawModularAvatar(ctx, avatar, sheets, time, {
+    isMoving: charObj.isMoving,
+    isRunning: charObj.isRunning,
+    action: charObj.action,
+    facing: charObj.facing,
+    scale: 0.275
+  });
 
   ctx.restore();
 

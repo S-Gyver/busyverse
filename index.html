@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>TEAM 3P - Virtual Office & Character Creator</title>
   <link rel="stylesheet" href="./src/styles/office.css" />
 </head>
@@ -37,69 +37,68 @@
       <button class="creator-back-btn" id="btnCloseCreator">
         <span>《</span> <span>สร้างตัวละคร</span>
       </button>
-      <span style="font-size: 12px; color: #e2e8f0;">
-        ✨ ผสมทรงผม เสื้อ กางเกง ใบหน้า แว่น หมวก ได้มากกว่า 10,000 รูปแบบ
+      <span class="creator-topbar-subtitle">
+        ⚔️ Ragnarok Online — Novice Male 8 ทิศทาง พร้อมทรงผม 30 แบบ
       </span>
     </div>
 
-    <div class="creator-body">
-      <!-- ฝั่งซ้าย: เลือกตัวละคร + ตั้งชื่อ -->
-      <div class="creator-left">
-        <div>
-          <div class="panel-section-title">
-            <span>เลือกตัวละคร</span>
+    <div class="creator-stage-area" id="creatorStageArea">
+      <div class="creator-body creator-body-wrapper" id="creatorBodyWrapper">
+        <!-- ฝั่งซ้าย: เลือกตัวละคร + เลือกทรงผม -->
+        <div class="creator-left">
+          <div>
+            <div class="panel-section-title">
+              <span>เลือกตัวละคร</span>
+            </div>
+            <div class="preset-grid" id="presetGrid"></div>
+
+            <div class="panel-section-title" style="margin-top: 14px;">
+              <span>ทรงผม RO (Hair)</span>
+              <span id="hairSelectLabel" style="font-size: 11.5px; color: #fde68a;">ทรงที่ 1/30</span>
+            </div>
+            <div class="hair-grid" id="hairGrid"></div>
           </div>
-          <div class="preset-grid" id="presetGrid"></div>
+        </div>
+
+        <!-- ตรงกลาง: แท่นยืนตัวละคร + ชื่อตัวละคร + คำอธิบาย -->
+        <div class="creator-center">
+          <div class="preview-controls">
+            <button class="preview-ctrl-btn active" data-pose="idle">● ยืนพรีวิว</button>
+            <button class="preview-ctrl-btn" data-pose="walk">▶ ทดสอบเดิน</button>
+            <button class="preview-ctrl-btn" data-pose="run">▶▶ ทดสอบวิ่ง</button>
+          </div>
 
           <div class="name-input-box">
             <label for="charNameInput">ชื่อตัวละคร:</label>
             <input type="text" id="charNameInput" value="คุณ (Lead)" maxlength="22" />
           </div>
-        </div>
-      </div>
 
-      <!-- ตรงกลาง: แท่นยืนตัวละคร + คำอธิบาย -->
-      <div class="creator-center">
-        <div class="preview-controls">
-          <button class="preview-ctrl-btn active" data-pose="idle">● ยืนพรีวิว</button>
-          <button class="preview-ctrl-btn" data-pose="walk">▶ ทดสอบเดิน</button>
-          <button class="preview-ctrl-btn" data-pose="run">▶▶ ทดสอบวิ่ง</button>
-          <button class="preview-ctrl-btn" id="btnRandomize">🎲 สุ่มชุด</button>
-        </div>
-
-        <div class="pedestal-stage">
-          <canvas id="creatorPreviewCanvas" width="460" height="520"></canvas>
-        </div>
-
-        <div class="lore-box" id="loreDesc">
-          สายลุยโค้ดแนวหน้า ถนัดการแก้บั๊กระยะประชิด มีความอึดและพละกำลังในการปั่นงานสูงมาก
-        </div>
-      </div>
-
-      <!-- ฝั่งขวา: เลือกคอสตูม + ปุ่มสร้าง -->
-      <div class="creator-right">
-        <div>
-          <div class="panel-section-title">
-            <span>เลือกคอสตูม</span>
-            <span id="costumeCategoryLabel" style="font-size: 11.5px; color: #fde68a;">ทรงผม (10)</span>
+          <div class="pedestal-stage">
+            <canvas id="creatorPreviewCanvas" width="460" height="520"></canvas>
           </div>
 
-          <div class="costume-panel">
-            <div class="costume-tabs" id="costumeTabs">
-              <button class="costume-tab active" data-cat="hair">💇 ผม</button>
-              <button class="costume-tab" data-cat="top">👕 เสื้อ</button>
-              <button class="costume-tab" data-cat="bottom">👖 กางเกง</button>
-              <button class="costume-tab" data-cat="face">😊 หน้า</button>
-              <button class="costume-tab" data-cat="glasses">👓 แว่น</button>
-              <button class="costume-tab" data-cat="hat">🎩 หมวก</button>
+          <div class="lore-box" id="loreDesc">
+            ตัวละคร Novice ชาย จาก Ragnarok Online รองรับการหันครบ 8 ทิศทาง พร้อมทรงผม 30 แบบ
+          </div>
+        </div>
+
+        <!-- ฝั่งขวา: หมุนดูทิศทาง (8 ทิศทาง) + ปุ่มสร้าง -->
+        <div class="creator-right">
+          <div>
+            <div class="panel-section-title">
+              <span>หมุนดูทิศทาง (8 ทิศทาง)</span>
+              <span id="costumeCategoryLabel" style="font-size: 11.5px; color: #fde68a;">RO Novice</span>
             </div>
-            <div class="costume-grid" id="costumeGrid"></div>
-          </div>
-        </div>
 
-        <div class="creator-action-btns">
-          <button class="btn-create-gold" id="btnCreateConfirm">สร้าง</button>
-          <button class="btn-spawn-friend" id="btnSpawnFriend" title="เสกตัวละครชุดนี้เพิ่มลงในห้องออฟฟิศ">➕ เพิ่มเพื่อนในห้อง</button>
+            <div class="costume-panel">
+              <div class="costume-grid" id="costumeGrid"></div>
+            </div>
+          </div>
+
+          <div class="creator-action-btns">
+            <button class="btn-create-gold" id="btnCreateConfirm">สร้าง</button>
+            <button class="btn-spawn-friend" id="btnSpawnFriend" title="เสกตัวละครชุดนี้เพิ่มลงในห้องออฟฟิศ">➕ เพิ่มเพื่อนในห้อง</button>
+          </div>
         </div>
       </div>
     </div>

@@ -53,10 +53,14 @@ export const CODE_TO_KEY = {
 };
 
 export const FACING_LABELS = {
-  down: 'หน้า (Front)',
-  up: 'หลัง (Back)',
-  left: 'ซ้าย (Left)',
-  right: 'ขวา (Right)'
+  down:        'หน้า (Front 0)',
+  front_left:  'หน้าเฉียงซ้าย (SW 1)',
+  left:        'ซ้าย (West 2)',
+  back_left:   'หลังเฉียงซ้าย (NW 3)',
+  up:          'หลัง (Back 4)',
+  back_right:  'หลังเฉียงขวา (NE 5)',
+  right:       'ขวา (East 6)',
+  front_right: 'หน้าเฉียงขวา (SE 7)'
 };
 
 export const DEFAULT_GUIDE_HTML =

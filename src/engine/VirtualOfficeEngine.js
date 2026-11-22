@@ -1,12 +1,26 @@
-import { ANIMATIONS } from '../config/spritesConfig.js';
 import {
   ZONES,
   SHORTCUT_MAP,
   CODE_TO_KEY,
-  FACING_LABELS
+  FACING_LABELS,
+  EMOTE_BUTTONS
 } from '../config/officeZones.js';
 import { loadSpriteSheets } from './spriteLoader.js';
 import { drawOffice, drawPlayer } from './officeRenderer.js';
+
+export function get8Direction(dx, dy) {
+  if (dx === 0 && dy === 0) return 'down';
+  const angle = Math.atan2(dy, dx) * (180 / Math.PI); // -180 ถึง 180 องศา
+  if (angle >= -22.5 && angle < 22.5) return 'right';
+  if (angle >= 22.5 && angle < 67.5) return 'front_right';
+  if (angle >= 67.5 && angle < 112.5) return 'down';
+  if (angle >= 112.5 && angle < 157.5) return 'front_left';
+  if (angle >= 157.5 || angle < -157.5) return 'left';
+  if (angle >= -157.5 && angle < -112.5) return 'back_left';
+  if (angle >= -112.5 && angle < -67.5) return 'up';
+  if (angle >= -67.5 && angle < -22.5) return 'back_right';
+  return 'down';
+}
 
 export class VirtualOfficeEngine {
   constructor(canvas, { onStateChange, onSheetsProgress } = {}) {
@@ -18,7 +32,7 @@ export class VirtualOfficeEngine {
     this.keys = {};
     this.rafId = null;
     this.isCreatorOpen = false;
-    this.loadInfo = { loaded: 0, total: 8, isReady: false };
+    this.loadInfo = { loaded: 0, total: 16, isReady: false };
 
     this.me = {
       name: 'คุณ (Lead)',
@@ -35,14 +49,15 @@ export class VirtualOfficeEngine {
       pantryVariant: 0,
       lastActiveTime: performance.now(),
       avatar: {
-        mode: 'modular',
+        character: 'ro_novice',
+        isRO: true,
         gender: 'male',
-        facing: 'down',
-        hairStyle: 'none'
+        hair: 1,
+        facing: 'down'
       }
     };
 
-    // เพื่อนร่วมทีมในออฟฟิศ (สามารถกดสร้างเพิ่มจากหน้าสร้างตัวละครได้สูงสุด 10+ คน)
+    // เพื่อนร่วมทีมในออฟฟิศ (RO Novice)
     this.npcs = [
       {
         name: 'มิ้นท์ (Designer)',
@@ -56,15 +71,11 @@ export class VirtualOfficeEngine {
         action: 'idle',
         nextMoveTime: 4000,
         avatar: {
-          mode: 'modular',
-          gender: 'female',
-          bodyIndex: 3,
-          face: 0,
-          hair: 6,
-          top: 5,
-          bottom: 5,
-          glasses: -1,
-          hat: 4
+          character: 'ro_novice',
+          isRO: true,
+          gender: 'male',
+          hair: 17,
+          facing: 'down'
         }
       },
       {
@@ -79,15 +90,11 @@ export class VirtualOfficeEngine {
         action: 'idle',
         nextMoveTime: 6500,
         avatar: {
-          mode: 'modular',
+          character: 'ro_novice',
+          isRO: true,
           gender: 'male',
-          bodyIndex: 1,
-          face: 1,
-          hair: 4,
-          top: 1,
-          bottom: 3,
-          glasses: 3,
-          hat: 1
+          hair: 22,
+          facing: 'right'
         }
       }
     ];
@@ -120,7 +127,7 @@ export class VirtualOfficeEngine {
     if (name && name.trim()) {
       this.me.name = name.trim();
     }
-    this.me.avatar = { ...avatarConfig };
+    this.me.avatar = { ...avatarConfig, character: 'ro_novice', isRO: true };
     this.me.lastActiveTime = performance.now();
     this.emitStateChange();
   }
@@ -143,7 +150,7 @@ export class VirtualOfficeEngine {
     const sy = Math.round(spot.y + jitterY);
 
     this.npcs.push({
-      name: (name && name.trim()) || `เพื่อน #${this.npcs.length + 1}`,
+      name: (name && name.trim()) || `เพื่อน RO #${this.npcs.length + 1}`,
       x: sx,
       y: sy,
       targetX: sx,
@@ -153,7 +160,7 @@ export class VirtualOfficeEngine {
       isRunning: false,
       action: 'idle',
       nextMoveTime: performance.now() + 3000 + Math.random() * 4000,
-      avatar: { ...avatarConfig, mode: 'modular' }
+      avatar: { ...avatarConfig, character: 'ro_novice', isRO: true }
     });
     this.emitStateChange();
   }
@@ -171,12 +178,12 @@ export class VirtualOfficeEngine {
     const { action, isMoving, isRunning, facing } = this.me;
     const { loaded, total, isReady } = this.loadInfo;
 
-    let statusText = `กำลังโหลดชุดภาพ (${loaded}/${total})...`;
+    let statusText = `กำลังโหลดภาพ RO (${loaded}/${total})...`;
     let dotColor = '#22c55e';
 
     if (action !== 'idle') {
-      const anim = ANIMATIONS[action];
-      statusText = anim && anim.label ? anim.label : action;
+      const btn = EMOTE_BUTTONS.find(b => b.action === action);
+      statusText = btn ? btn.label : action;
       dotColor =
         action === 'angry' || action === 'angry_talk'
           ? '#ef4444'
@@ -219,7 +226,9 @@ export class VirtualOfficeEngine {
     this.me.isMoving = false;
 
     if (newAction === 'sit' && this.me.action === 'sit') {
-      this.me.sitVariant = (this.me.sitVariant + 1) % 3;
+      newAction = 'idle';
+    } else if (newAction === 'sleep' && this.me.action === 'sleep') {
+      newAction = 'idle';
     }
     if (this.me.action !== newAction) {
       this.me.actionStartTime = performance.now();
@@ -236,6 +245,20 @@ export class VirtualOfficeEngine {
     const k = CODE_TO_KEY[e.code] || e.key.toLowerCase();
     this.keys[k] = true;
     this.me.lastActiveTime = performance.now();
+
+    // สไตล์ RO: ขณะกำลังนั่ง พอกดปุ่มทิศทาง จะหมุนหันไปทางนั้นทันทีในท่านั่งโดยไม่เดิน
+    if (this.me.action === 'sit') {
+      let dxKey = 0;
+      let dyKey = 0;
+      if (this.keys['w'] || this.keys['arrowup']) dyKey -= 1;
+      if (this.keys['s'] || this.keys['arrowdown']) dyKey += 1;
+      if (this.keys['a'] || this.keys['arrowleft']) dxKey -= 1;
+      if (this.keys['d'] || this.keys['arrowright']) dxKey += 1;
+      if (dxKey !== 0 || dyKey !== 0) {
+        this.me.facing = get8Direction(dxKey, dyKey);
+        this.emitStateChange();
+      }
+    }
 
     if (SHORTCUT_MAP[k]) {
       this.setAction(SHORTCUT_MAP[k]);
@@ -274,6 +297,16 @@ export class VirtualOfficeEngine {
     const cx = (e.clientX - rect.left) * scaleX;
     const cy = (e.clientY - rect.top) * scaleY;
     if (cy > 95 && cy < 575) {
+      if (this.me.action === 'sit') {
+        // สไตล์ RO: คลิกพื้นขณะนั่ง จะหมุนหันไปทางนั้นในท่านั่งโดยไม่ลุกเดิน
+        this.me.facing = get8Direction(cx - this.me.x, cy - this.me.y);
+        this.me.targetX = this.me.x;
+        this.me.targetY = this.me.y;
+        this.me.isMoving = false;
+        this.me.lastActiveTime = performance.now();
+        this.emitStateChange();
+        return;
+      }
       this.me.targetX = cx;
       this.me.targetY = cy;
       this.me.lastActiveTime = performance.now();
@@ -294,9 +327,6 @@ export class VirtualOfficeEngine {
           npc.targetX = roamX;
           npc.targetY = roamY;
           npc.action = 'idle';
-        } else {
-          const randomActions = ['idle', 'normal_talk', 'laugh', 'eat_fruit', 'victory'];
-          npc.action = randomActions[Math.floor(Math.random() * randomActions.length)];
         }
       }
 
@@ -306,7 +336,7 @@ export class VirtualOfficeEngine {
       if (dist > 3) {
         npc.x += (dx / dist) * 2.1;
         npc.y += (dy / dist) * 2.1;
-        npc.facing = Math.abs(dx) >= Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up');
+        npc.facing = get8Direction(dx, dy);
         npc.isMoving = true;
       } else {
         npc.isMoving = false;
@@ -330,21 +360,24 @@ export class VirtualOfficeEngine {
     if (this.keys['d'] || this.keys['arrowright']) dxKey += 1;
 
     if (dxKey !== 0 || dyKey !== 0) {
-      const len = Math.hypot(dxKey, dyKey);
-      this.me.x += (dxKey / len) * speed;
-      this.me.y += (dyKey / len) * speed;
-      this.me.targetX = this.me.x;
-      this.me.targetY = this.me.y;
-      this.me.isMoving = true;
-
-      if (Math.abs(dxKey) >= Math.abs(dyKey)) {
-        this.me.facing = dxKey > 0 ? 'right' : 'left';
+      if (this.me.action === 'sit') {
+        // สไตล์ Ragnarok Online: ขณะกำลังนั่ง พอกดปุ่มทิศทาง จะไม่เดินและไม่ลุก แต่จะหมุนหันไปทางนั้นในท่านั่ง
+        this.me.facing = get8Direction(dxKey, dyKey);
+        this.me.isMoving = false;
+        this.me.targetX = this.me.x;
+        this.me.targetY = this.me.y;
       } else {
-        this.me.facing = dyKey > 0 ? 'down' : 'up';
-      }
+        const len = Math.hypot(dxKey, dyKey);
+        this.me.x += (dxKey / len) * speed;
+        this.me.y += (dyKey / len) * speed;
+        this.me.targetX = this.me.x;
+        this.me.targetY = this.me.y;
+        this.me.isMoving = true;
+        this.me.facing = get8Direction(dxKey, dyKey);
 
-      if (this.me.action !== 'idle') {
-        this.me.action = 'idle';
+        if (this.me.action !== 'idle') {
+          this.me.action = 'idle';
+        }
       }
     } else {
       const dx = this.me.targetX - this.me.x;
@@ -352,25 +385,20 @@ export class VirtualOfficeEngine {
       const dist = Math.hypot(dx, dy);
 
       if (dist > 3) {
-        this.me.x += (dx / dist) * speed;
-        this.me.y += (dy / dist) * speed;
-        if (Math.abs(dx) >= Math.abs(dy)) {
-          this.me.facing = dx > 0 ? 'right' : 'left';
+        if (this.me.action === 'sit') {
+          this.me.facing = get8Direction(dx, dy);
+          this.me.isMoving = false;
+          this.me.targetX = this.me.x;
+          this.me.targetY = this.me.y;
         } else {
-          this.me.facing = dy > 0 ? 'down' : 'up';
+          this.me.x += (dx / dist) * speed;
+          this.me.y += (dy / dist) * speed;
+          this.me.facing = get8Direction(dx, dy);
+          this.me.isMoving = true;
         }
-        this.me.isMoving = true;
       } else {
         this.me.isMoving = false;
       }
-    }
-
-    if (
-      !this.me.isMoving &&
-      this.me.action === 'idle' &&
-      time - this.me.lastActiveTime > 25000
-    ) {
-      this.setAction('sleep');
     }
 
     this.me.x = Math.max(40, Math.min(this.canvas.width - 40, this.me.x));

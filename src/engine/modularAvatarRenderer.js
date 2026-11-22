@@ -1,64 +1,163 @@
-import { BODY_FILE_MAP, HAIR_4WAY_STYLES } from '../config/avatarItemsConfig.js';
+import {
+  BODY_FILE_MAP,
+  WALK_BODY_MAP,
+  SIT_BODY_MAP,
+  RO_HEAD_OFFSETS,
+  RO_HAIR_OFFSETS,
+  RO_HEAD_BASE_H,
+  RO_WALK_HEAD_OFFSETS,
+  RO_SIT_HEAD_OFFSETS,
+  RO_SLEEP_HEAD_OFFSET,
+  RO_SLEEP_HAIR_OFFSETS
+} from '../config/avatarItemsConfig.js';
 
 /**
- * วาดหุ่นตัวละครพื้นฐาน 4 ทิศทาง + ทรงผม 4 ทิศทาง (Local 100%)
+ * ดึง Offset ของทรงผม (ถ้ามีตั้งเฉพาะทรงใน RO_HAIR_OFFSETS จะใช้ค่านั้นก่อน ถ้าไม่มีจะใช้ RO_HEAD_OFFSETS)
+ */
+export function getHairOffset(hairId, facing) {
+  if (RO_HAIR_OFFSETS && RO_HAIR_OFFSETS[hairId] && RO_HAIR_OFFSETS[hairId][facing]) {
+    return RO_HAIR_OFFSETS[hairId][facing];
+  }
+  return (RO_HEAD_OFFSETS && RO_HEAD_OFFSETS[facing]) || { x: 0, y: 0 };
+}
+
+/**
+ * ดึงหรือโหลด Sprite ของทรงผม RO 1_male ถึง 30_male ใน 8 ทิศทาง หรือท่านอน
+ */
+export function getHairSheet(sheets, hairId = 1, facing = 'down', isSleeping = false) {
+  const safeId = hairId || 1;
+  if (isSleeping) {
+    const sleepKey = `ro_hair_${safeId}_sleep`;
+    if (sheets[sleepKey] && sheets[sleepKey].complete && sheets[sleepKey].naturalWidth > 0) {
+      return sheets[sleepKey];
+    }
+    if (!sheets[sleepKey]) {
+      const img = new Image();
+      img.src = `./assets/body/male/hair/${safeId}_male/hair_sleep.png`;
+      sheets[sleepKey] = img;
+    }
+    if (sheets[sleepKey].complete && sheets[sleepKey].naturalWidth > 0) {
+      return sheets[sleepKey];
+    }
+    if (sheets['ro_hair_sleep'] && sheets['ro_hair_sleep'].complete && sheets['ro_hair_sleep'].naturalWidth > 0) {
+      return sheets['ro_hair_sleep'];
+    }
+    // หากทรงผมนี้ยังไม่มีสไปรต์ท่านอน ให้ใช้หน้าตรง down แทน
+    return getHairSheet(sheets, hairId, 'down', false);
+  }
+
+  const key = `ro_hair_${safeId}_${facing}`;
+  if (sheets[key] && sheets[key].complete && sheets[key].naturalWidth > 0) {
+    return sheets[key];
+  }
+  if (!sheets[key]) {
+    const img = new Image();
+    img.src = `./assets/body/male/hair/${safeId}_male/hair_${facing}.png`;
+    sheets[key] = img;
+  }
+  if (sheets[key].complete && sheets[key].naturalWidth > 0) {
+    return sheets[key];
+  }
+  return sheets[`ro_hair_${facing}`];
+}
+
+/**
+ * วาดตัวละคร RO Novice 8 ทิศทาง ตัวหุ่น + ทรงผม
  */
 export function drawModularAvatar(ctx, avatar, sheets, time, state = {}) {
   const isMoving = Boolean(state.isMoving);
   const isRunning = Boolean(state.isRunning);
+  const action = state.action || avatar.action || 'idle';
   const facing = state.facing || avatar.facing || 'down';
   const renderScale = state.scale || 0.255;
-  const gender = avatar.gender === 'female' ? 'female' : 'male';
-
-  const genderMap = BODY_FILE_MAP[gender] || BODY_FILE_MAP.male;
-  const sheetKey = genderMap[facing] || genderMap.down;
-  const img = sheets[sheetKey];
-
-  if (!(img && img.complete && img.naturalWidth > 0)) return false;
-
-  let bobY = 0;
-  let tiltAngle = 0;
-  if (isMoving) {
-    const freq = isRunning ? 0.022 : 0.014;
-    const amp = isRunning ? 12 : 7;
-    bobY = -Math.abs(Math.sin(time * freq)) * amp;
-    tiltAngle = Math.sin(time * freq) * (isRunning ? 0.08 : 0.04);
-  } else {
-    bobY = Math.sin(time * 0.004) * 2;
-  }
 
   ctx.save();
+  ctx.imageSmoothingEnabled = false;
   ctx.scale(renderScale, renderScale);
-  ctx.translate(0, bobY);
-  ctx.rotate(tiltAngle);
 
-  const targetH = 340;
-  const targetW = (img.naturalWidth / img.naturalHeight) * targetH;
+  let bodyKey = (BODY_FILE_MAP.ro_novice && BODY_FILE_MAP.ro_novice[facing]) || 'ro_body_down';
+  const isSitting = !isMoving && action === 'sit';
+  const isSleeping = !isMoving && action === 'sleep';
+
+  if (isSitting) {
+    const sitKey = SIT_BODY_MAP?.ro_novice?.[facing];
+    if (sheets[sitKey] && sheets[sitKey].complete && sheets[sitKey].naturalWidth > 0) {
+      bodyKey = sitKey;
+    }
+  } else if (isSleeping) {
+    if (sheets['ro_sleep'] && sheets['ro_sleep'].complete && sheets['ro_sleep'].naturalWidth > 0) {
+      bodyKey = 'ro_sleep';
+    }
+  }
+
+  let bImg = sheets[bodyKey];
+  const hairId = avatar.hair || 1;
+  // เมื่อนอนลงกับพื้น จะหันหน้าตรงตามสไปรต์ตัวท่านอนเสมอ
+  const hairFacing = isSleeping ? 'down' : facing;
+  const hImg = getHairSheet(sheets, hairId, hairFacing, isSleeping);
+
+  // ตรวจสอบและดึงภาพแอนิเมชันเดิน (Walk Frames) หากตัวละครกำลังเคลื่อนไหว
+  const walkFrames = WALK_BODY_MAP?.ro_novice?.[facing];
+  let hasWalkAnim = false;
+  let frameIdx = 0;
+  if (isMoving && walkFrames && walkFrames.length > 0) {
+    const frameDuration = isRunning ? 75 : 115;
+    frameIdx = Math.floor((time / frameDuration) % walkFrames.length);
+    const walkKey = walkFrames[frameIdx];
+    if (sheets[walkKey] && sheets[walkKey].complete && sheets[walkKey].naturalWidth > 0) {
+      bImg = sheets[walkKey];
+      hasWalkAnim = true;
+    }
+  }
+
+  if (!(bImg && bImg.complete && bImg.naturalWidth > 0)) {
+    ctx.restore();
+    return false;
+  }
+
+  let bobY = 0;
+  // ใช้ sine bobbing เฉพาะทิศทางที่ยังไม่มีภาพสไปรต์เดินแบบแยกเฟรม (ไม่ใช้ตอนนั่ง/นอน)
+  if (isMoving && !hasWalkAnim) {
+    const freq = isRunning ? 0.022 : 0.014;
+    const amp = isRunning ? 10 : 6;
+    bobY = -Math.abs(Math.sin(time * freq)) * amp;
+  }
+  if (bobY !== 0) {
+    ctx.translate(0, bobY);
+  }
+
+  const pixelScale = 3.6;
+  const overlap = 5;
   const footY = 12;
 
-  // 1. วาดหุ่น Base Body
-  ctx.drawImage(img, -targetW / 2, footY - targetH, targetW, targetH);
+  const bodyW = bImg.naturalWidth * pixelScale;
+  const bodyH = bImg.naturalHeight * pixelScale;
+  const bodyX = -bodyW / 2;
+  const bodyY = footY - bodyH;
 
-  // 2. วาดทรงผม 4 ทิศทาง (ถ้าเลือกทรงผมไว้)
-  const hairStyleKey = avatar.hairStyle;
-  if (hairStyleKey && hairStyleKey !== 'none') {
-    const hairStyle = HAIR_4WAY_STYLES[hairStyleKey];
-    if (hairStyle) {
-      const hairSheetKey = hairStyle.sheets[facing] || hairStyle.sheets.down;
-      const hairImg = sheets[hairSheetKey];
-      if (hairImg && hairImg.complete && hairImg.naturalWidth > 0) {
-        const cfg = (hairStyle.offsets && hairStyle.offsets[facing]) || { w: 184, ox: 0, oy: -24 };
-        const hw = cfg.w;
-        const hh = (hairImg.naturalHeight / hairImg.naturalWidth) * hw;
-        ctx.drawImage(
-          hairImg,
-          -hw / 2 + cfg.ox,
-          footY - targetH + cfg.oy,
-          hw,
-          hh
-        );
-      }
-    }
+  // 1. วาดตัวหุ่น
+  ctx.drawImage(bImg, bodyX, bodyY, bodyW, bodyH);
+
+  // 2. วาดทรงผมซ้อนทับลงบนหัว
+  // ใช้ baseHeadH เพื่อล็อกตำแหน่งกะโหลกศีรษะ/ตา ทรงผมยาว (หางม้า) จะห้อยลงมาพาดหลังธรรมชาติ ไม่ดันหัวลอย
+  if (hImg && hImg.complete && hImg.naturalWidth > 0) {
+    const offset = getHairOffset(hairId, hairFacing);
+    const walkOffset = (hasWalkAnim && RO_WALK_HEAD_OFFSETS?.[facing]?.[frameIdx]) || { x: 0, y: 0 };
+    const sitOffset = (isSitting && RO_SIT_HEAD_OFFSETS?.[facing]) || { x: 0, y: 0 };
+    const isSleepHair = isSleeping && hImg && (
+      (hImg.src && hImg.src.includes('hair_sleep')) ||
+      sheets[`ro_hair_${hairId}_sleep`] === hImg ||
+      sheets['ro_hair_sleep'] === hImg
+    );
+    const sleepOffset = isSleeping
+      ? ((isSleepHair && (RO_SLEEP_HAIR_OFFSETS?.[hairId] || { x: 18, y: 22 })) || RO_SLEEP_HEAD_OFFSET || { x: 18, y: 22 })
+      : { x: 0, y: 0 };
+    const baseHeadH = ((RO_HEAD_BASE_H && RO_HEAD_BASE_H[hairFacing]) || 26) * pixelScale;
+    const hairW = hImg.naturalWidth * pixelScale;
+    const hairH = hImg.naturalHeight * pixelScale;
+    const hairX = -hairW / 2 + ((offset.x + walkOffset.x + sitOffset.x + sleepOffset.x) * pixelScale);
+    const hairY = bodyY - baseHeadH + ((overlap + offset.y + walkOffset.y + sitOffset.y + sleepOffset.y) * pixelScale);
+    ctx.drawImage(hImg, hairX, hairY, hairW, hairH);
   }
 
   ctx.restore();
@@ -66,32 +165,73 @@ export function drawModularAvatar(ctx, avatar, sheets, time, state = {}) {
 }
 
 /**
- * วาดรูปพรีวิวหุ่น (พร้อมทรงผมถ้ามี) ลงในการ์ดเลือกเพศ / การ์ด 4 ทิศทาง
+ * วาดรูปพรีวิวหุ่นลงในการ์ดเลือกตัวละคร / การ์ดหันทิศทาง 8 ทิศ
  */
-export function drawBaseBodyCard(canvas, gender, facingDir, sheets, avatar = null) {
+export function drawBaseBodyCard(canvas, character, facingDir = 'down', sheets, hairId = 1) {
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   const w = canvas.width;
   const h = canvas.height;
   ctx.clearRect(0, 0, w, h);
+  ctx.imageSmoothingEnabled = false;
 
-  const genderMap = BODY_FILE_MAP[gender] || BODY_FILE_MAP.male;
-  const sheetKey = genderMap[facingDir] || genderMap.down;
-  const img = sheets[sheetKey];
-  if (!(img && img.complete && img.naturalWidth > 0)) return;
+  const bodyKey = (BODY_FILE_MAP.ro_novice && BODY_FILE_MAP.ro_novice[facingDir]) || 'ro_body_down';
+  const bImg = sheets[bodyKey];
+  const hImg = getHairSheet(sheets, hairId, facingDir);
 
-  ctx.save();
-  ctx.translate(w / 2, h - 8);
-  drawModularAvatar(
-    ctx,
-    {
-      gender,
-      facing: facingDir,
-      hairStyle: avatar ? avatar.hairStyle : 'none'
-    },
-    sheets,
-    0,
-    { facing: facingDir, scale: Math.min(w, h) / 390, isMoving: false }
-  );
-  ctx.restore();
+  if (!(bImg && bImg.complete && bImg.naturalWidth > 0)) {
+    if (bImg) bImg.onload = () => drawBaseBodyCard(canvas, character, facingDir, sheets, hairId);
+    return;
+  }
+
+  const overlap = 5;
+  const baseH = (RO_HEAD_BASE_H && RO_HEAD_BASE_H[facingDir]) || 26;
+  const totalH = bImg.naturalHeight + baseH - overlap;
+  const maxW = Math.max(bImg.naturalWidth, hImg && hImg.naturalWidth ? hImg.naturalWidth : 0);
+
+  const pad = 8;
+  const scale = Math.min((w - pad * 2) / maxW, (h - pad * 2) / totalH);
+
+  const dw = bImg.naturalWidth * scale;
+  const dh = bImg.naturalHeight * scale;
+  const startX = (w - dw) / 2;
+  const startY = (h - totalH * scale) / 2;
+
+  const bodyY = startY + (totalH - bImg.naturalHeight) * scale;
+  ctx.drawImage(bImg, startX, bodyY, dw, dh);
+
+  if (hImg && hImg.complete && hImg.naturalWidth > 0) {
+    const offset = getHairOffset(hairId, facingDir);
+    const baseHeadH = baseH * scale;
+    const hw = hImg.naturalWidth * scale;
+    const hh = hImg.naturalHeight * scale;
+    const hx = (w - hw) / 2 + (offset.x * scale);
+    const hy = bodyY - baseHeadH + ((overlap + offset.y) * scale);
+    ctx.drawImage(hImg, hx, hy, hw, hh);
+  }
+}
+
+/**
+ * วาดรูปพรีวิวเฉพาะทรงผมลงในการ์ดเลือกทรงผม 1_male ถึง 30_male
+ */
+export function drawHairThumbCard(canvas, hairId, sheets) {
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width;
+  const h = canvas.height;
+  ctx.clearRect(0, 0, w, h);
+  ctx.imageSmoothingEnabled = false;
+
+  const hImg = getHairSheet(sheets, hairId, 'down');
+  if (!(hImg && hImg.complete && hImg.naturalWidth > 0)) {
+    if (hImg) hImg.onload = () => drawHairThumbCard(canvas, hairId, sheets);
+    return;
+  }
+
+  const pad = 10;
+  const scale = Math.min((w - pad * 2) / hImg.naturalWidth, (h - pad * 2) / hImg.naturalHeight);
+  const dw = hImg.naturalWidth * scale;
+  const dh = hImg.naturalHeight * scale;
+
+  ctx.drawImage(hImg, (w - dw) / 2, (h - dh) / 2, dw, dh);
 }

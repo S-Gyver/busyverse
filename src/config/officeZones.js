@@ -31,6 +31,8 @@ export const SHORTCUT_MAP = {
   '2': 'serious_talk',
   '3': 'angry_talk',
   '4': 'sit',
+  'x': 'sit',
+  'insert': 'sit',
   '5': 'eat_chicken',
   '6': 'eat_fruit',
   '7': 'drink_water',
@@ -43,7 +45,8 @@ export const SHORTCUT_MAP = {
 // แปลง e.code เป็นปุ่มมาตรฐาน (รองรับคีย์บอร์ดภาษาไทย/อังกฤษ)
 export const CODE_TO_KEY = {
   KeyW: 'w', KeyA: 'a', KeyS: 's', KeyD: 'd', KeyE: 'e',
-  KeyV: 'v', KeyZ: 'z',
+  KeyV: 'v', KeyZ: 'z', KeyX: 'x',
+  Insert: 'insert',
   ShiftLeft: 'shift', ShiftRight: 'shift',
   ArrowUp: 'arrowup', ArrowDown: 'arrowdown', ArrowLeft: 'arrowleft', ArrowRight: 'arrowright',
   Digit0: '0', Digit1: '1', Digit2: '2', Digit3: '3', Digit4: '4',
@@ -53,10 +56,14 @@ export const CODE_TO_KEY = {
 };
 
 export const FACING_LABELS = {
-  down: 'หน้า (Front)',
-  up: 'หลัง (Back)',
-  left: 'ซ้าย (Left)',
-  right: 'ขวา (Right)'
+  down:        'หน้า (Front 0)',
+  front_left:  'หน้าเฉียงซ้าย (SW 1)',
+  left:        'ซ้าย (West 2)',
+  back_left:   'หลังเฉียงซ้าย (NW 3)',
+  up:          'หลัง (Back 4)',
+  back_right:  'หลังเฉียงขวา (NE 5)',
+  right:       'ขวา (East 6)',
+  front_right: 'หน้าเฉียงขวา (SE 7)'
 };
 
 export const DEFAULT_GUIDE_HTML =
